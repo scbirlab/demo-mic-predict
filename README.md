@@ -1,5 +1,5 @@
 ---
-title: Abx Predict Mic Uncertainty
+title: Predict MICs against bacterial species with uncertainty
 emoji: ⚡
 colorFrom: gray
 colorTo: pink
