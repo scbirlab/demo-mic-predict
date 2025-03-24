@@ -1,7 +1,7 @@
 ---
 title: Abx Predict Mic Uncertainty
 emoji: ⚡
-colorFrom: pink
+colorFrom: gray
 colorTo: pink
 sdk: gradio
 sdk_version: 5.22.0
