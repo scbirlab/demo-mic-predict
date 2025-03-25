@@ -13,6 +13,7 @@ models:
   - scbirlab/spark-dv-fp-2503-kpn
 preload_from_hub:
   - scbirlab/spark-dv-fp-2503-kpn
+  - scbirlab/thomas-2018-spark-wt
 ---
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
