@@ -3,7 +3,7 @@
 from typing import Iterable, List, Optional, Union
 from io import TextIOWrapper
 import os
-os.environ["COMMANDLINE_ARGS"] = "--no-gradio-queue"
+# os.environ["COMMANDLINE_ARGS"] = "--no-gradio-queue"
 
 from carabiner import cast, print_err
 from carabiner.pd import read_table
