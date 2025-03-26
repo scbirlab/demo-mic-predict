@@ -1,5 +1,4 @@
 carabiner-tools[pd,mpl]>=0.0.4
-duvida[chem] @ git+https://github.com/scbirlab/duvida@b4efe69
-nemony
+duvida[chem] @ git+https://github.com/scbirlab/duvida@main
 numpy
 schemist>=0.0.4.post1
