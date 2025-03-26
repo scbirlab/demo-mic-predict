@@ -1,5 +1,5 @@
-carabiner-tools[pd,mpl]>=0.0.4
-duvida[chem] @ git+https://github.com/scbirlab/duvida@82a79cf
+carabiner-tools[pd]>=0.0.4
+duvida[chem] @ git+https://github.com/scbirlab/duvida@f5b1144
 gradio==5.23.1
 nemony
 numpy
