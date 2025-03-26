@@ -198,6 +198,9 @@ def predict_file(
     species_to_predict = cast(predict, to=list)
     prediction_cols = []
     for species in species_to_predict:
+        message = f"Predicting for species: {species}"
+        print_err(message)
+        gr.Info(message, duration=3)
         this_modelbox = MODELBOXES[species]
         this_features = this_modelbox._input_cols
         this_labels = this_modelbox._label_cols
@@ -208,10 +211,12 @@ def predict_file(
             })
             .assign(**{label: np.nan for label in this_labels})
         )
+        print(this_prediction_input)
         prediction = this_modelbox.predict(
             data=this_prediction_input,
             features=this_features,
             labels=this_labels,
+            aggregator="mean",
             cache="./cache"
         ).with_format("numpy")["__prediction__"].flatten()
         print(prediction)
@@ -224,6 +229,8 @@ def predict_file(
             this_col = f"{species}: {extra_metric}"
             prediction_cols.append(this_col)
             print(">>>", this_modelbox._input_training_data)
+            print(">>>", this_modelbox._input_training_data.format)
+            print(">>>", this_modelbox._in_key, this_modelbox._out_key)
             this_extra = (
                 EXTRA_METRICS[extra_metric](
                     this_modelbox,
@@ -231,7 +238,7 @@ def predict_file(
                 )
                 .with_format("numpy")
             )
-            prediction_df[this_col] = this_extra[this_extra.column_names[0]]
+            prediction_df[this_col] = this_extra[this_extra.column_names[-1]]
 
     return prediction_df[['id'] + prediction_cols + ['smiles', 'inchikey', "mwt", "clogp"]]
 
