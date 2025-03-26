@@ -195,6 +195,11 @@ def predict_file(
         input_representation=input_representation,
         output_representation=["id", "smiles", "inchikey", "mwt", "clogp"],
     )
+    if prediction_df.shape[0] > 1000:
+        message = f"Truncating input to 1000 rows"
+        print_err(message)
+        gr.Info(message, duration=3)
+        prediction_df = prediction_df.iloc[:1000]
     species_to_predict = cast(predict, to=list)
     prediction_cols = []
     for species in species_to_predict:
@@ -347,12 +352,13 @@ with gr.Blocks() as demo:
             label="Download predictions",
             visible=False,
         )
-        output_line = gr.DataFrame(
-            label="Predictions",
-            interactive=False,
-            visible=False,
-        )
-        drawing = gr.Image(label="Chemical structures")
+        with gr.Row():
+            output_line = gr.DataFrame(
+                label="Predictions",
+                interactive=False,
+                visible=False,
+            )
+            drawing = gr.Image(label="Chemical structures")
         gr.on(
             [
                 input_line.submit,
@@ -380,7 +386,7 @@ with gr.Blocks() as demo:
             outputs=download_single
         )
 
-    with gr.Tab("Convert a file"):
+    with gr.Tab("Convert a file (max. 1000 rows)"):
         input_file = gr.File(
             label="Upload a table of chemical compounds here",
             file_types=[".xlsx", ".csv", ".tsv", ".txt"],
@@ -418,7 +424,7 @@ with gr.Blocks() as demo:
         )
         input_data = gr.Dataframe(
             label="Input data",
-            max_height=100,
+            max_height=500,
             visible=False,
             interactive=False,
         )
