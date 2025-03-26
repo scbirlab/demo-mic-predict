@@ -16,4 +16,6 @@ preload_from_hub:
   - scbirlab/thomas-2018-spark-wt
 ---
 
+[![Open in Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-md-dark.svg)](https://huggingface.co/spaces/scbirlab/mic-predict)
+
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
