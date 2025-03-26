@@ -182,6 +182,7 @@ def predict_file(
     df: pd.DataFrame, 
     column: str = 'smiles',
     input_representation: str = 'smiles',
+    predict: Union[Iterable[str], str] = 'smiles', 
     extra_metrics: Optional[Union[Iterable[str], str]] = None
 ):
     if extra_metrics is None:
