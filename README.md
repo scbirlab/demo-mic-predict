@@ -4,8 +4,8 @@ emoji: ⚡
 colorFrom: gray
 colorTo: pink
 sdk: gradio
-sdk_version: 5.22.0
-python_version: 3.12
+sdk_version: 5.23.1
+python_version: 3.11.10
 app_file: app.py
 pinned: false
 license: mit
