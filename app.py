@@ -95,7 +95,7 @@ def predict_one(
     prediction_df = convert_one(
         strings=strings,
         input_representation=input_representation,
-        output_representation=['id', 'smiles', 'inchikey', "mwt", "clogp"],
+        output_representation=['id', 'pubhem_name', 'pubchem_id', 'smiles', 'inchikey', "mwt", "clogp"],
     )
     species_to_predict = cast(predict, to=list)
     prediction_cols = []
@@ -143,7 +143,7 @@ def predict_one(
             prediction_df[this_col] = this_extra[this_extra.column_names[-1]]
         
     return gr.DataFrame(
-        prediction_df[['id'] + prediction_cols + ['smiles', 'inchikey', "mwt", "clogp"]],
+        prediction_df[['id', 'pubhem_name', 'pubhem_id'] + prediction_cols + ['smiles', 'inchikey', "mwt", "clogp"]],
         visible=True
     )
 
@@ -339,13 +339,12 @@ with gr.Blocks() as demo:
             label="Download predictions",
             visible=False,
         )
-        with gr.Row():
-            output_line = gr.DataFrame(
-                label="Predictions",
-                interactive=False,
-                visible=False,
-            )
-            drawing = gr.Image(label="Chemical structures")
+        output_line = gr.DataFrame(
+            label="Predictions",
+            interactive=False,
+            visible=False,
+        )
+        drawing = gr.Image(label="Chemical structures")
         gr.on(
             [
                 input_line.submit,
@@ -395,6 +394,12 @@ with gr.Blocks() as demo:
             value=list(MODEL_REPOS)[:1],
             interactive=True,
         )
+        extra_metric_file = gr.CheckboxGroup(
+            label="Extra metrics (can increase calculation time!)",
+            choices=list(EXTRA_METRICS),
+            value=list(EXTRA_METRICS)[:2],
+            interactive=True,
+        )
         go_button2 = gr.Button(
             value="Predict!",
         )
@@ -416,12 +421,13 @@ with gr.Blocks() as demo:
             outputs=[input_data, input_column]
         )
         go_button2.click(
-            convert_file,
+            predict_file,
             inputs=[
                 input_data, 
                 input_column,
                 input_format,
                 output_species,
+                extra_metric_file,
             ],
             outputs={
                 input_data,
