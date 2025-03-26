@@ -12,8 +12,7 @@ license: mit
 short_description: Predict MIC (with uncertainty) against bacterial species
 models:
   - scbirlab/spark-dv-fp-2503-kpn
-preload_from_hub:
-  - scbirlab/spark-dv-fp-2503-kpn
+datasets:
   - scbirlab/thomas-2018-spark-wt
 ---
 
