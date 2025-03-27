@@ -22,25 +22,29 @@ from schemist.converting import (
 from schemist.tables import converter
 import torch
 
+CACHE = "./cache"
 HEADER_FILE = os.path.join("sources", "header.md")
 MODEL_REPOS = {
     "Klebsiella pneumoniae": "hf://scbirlab/spark-dv-fp-2503-kpn",
 }
 
 MODELBOXES = {
-    key: AutoModelBox.from_pretrained(val, cache_dir="./cache")
+    key: AutoModelBox.from_pretrained(val, cache_dir=CACHE)
     for key, val in MODEL_REPOS.items()
 }
 
 EXTRA_METRICS = {
-    "log10(variance)": lambda modelbox, candidates: modelbox.prediction_variance(candidates=candidates).map(lambda x: {modelbox._variance_key: torch.log10(x[modelbox._variance_key])}), 
+    "log10(variance)": lambda modelbox, candidates: modelbox.prediction_variance(candidates=candidates, cache=CACHE).map(lambda x: {modelbox._variance_key: torch.log10(x[modelbox._variance_key])}), 
     "Tanimoto nearest neighbor to training data": lambda modelbox, candidates: modelbox.tanimoto_nn(candidates=candidates), 
-    "Doubtscore": lambda modelbox, candidates: modelbox.doubtscore(candidates=candidates).map(lambda x: {"doubtscore": torch.log10(x["doubtscore"])}), 
-    "Information sensitivity (approx.)": lambda modelbox, candidates: modelbox.information_sensitivity(candidates=candidates, optimality_approximation=True, approximator="squared_jacobian").map(lambda x: {"information sensitivity": torch.log10(x["information sensitivity"])}),
+    "Doubtscore": lambda modelbox, candidates: modelbox.doubtscore(candidates=candidates, cache=CACHE).map(lambda x: {"doubtscore": torch.log10(x["doubtscore"])}), 
+    "Information sensitivity (approx.)": lambda modelbox, candidates: modelbox.information_sensitivity(candidates=candidates, optimality_approximation=True, approximator="squared_jacobian", cache=CACHE).map(lambda x: {"information sensitivity": torch.log10(x["information sensitivity"])}),
 }
 
-def load_input_data(file: TextIOWrapper) -> pd.DataFrame:
-    df = read_table(file.name)
+def load_input_data(file: Union[TextIOWrapper, str]) -> pd.DataFrame:
+    file = file if isinstance(file, str) else file.name
+    print_err(f"Loading {file}")
+    df = read_table(file)
+    print_err(df.head())
     string_cols = list(df.select_dtypes(exclude=[np.number]))
     df = gr.Dataframe(value=df, visible=True)
     return df, gr.Dropdown(choices=string_cols, interactive=True, value=string_cols[0])
@@ -119,7 +123,7 @@ def predict_one(
             features=this_features,
             labels=this_labels,
             aggregator="mean",
-            cache="./cache"
+            cache=CACHE,
         ).with_format("numpy")["__prediction__"].flatten()
         print(prediction)
         this_col = f"{species}: predicted MIC (µM)"
@@ -160,7 +164,11 @@ def convert_file(
     input_representation: str = 'smiles',
     output_representation: Union[str, Iterable[str]] = 'smiles'
 ):
-    message = f"Converting from {input_representation} to {output_representation}..."
+    output_representation = cast(output_representation, to=list)
+    for rep in output_representation:
+        message = f"Converting from {input_representation} to {rep}..."
+        gr.Info(message, duration=10)
+    print_err(df.head())
     print_err(message)
     gr.Info(message, duration=3)
     errors, df = converter(
@@ -204,7 +212,7 @@ def predict_file(
     if prediction_df.shape[0] > 1000:
         message = f"Truncating input to 1000 rows"
         print_err(message)
-        gr.Info(message, duration=3)
+        gr.Info(message, duration=15)
         prediction_df = prediction_df.iloc[:1000]
     species_to_predict = cast(predict, to=list)
     prediction_cols = []
@@ -228,14 +236,20 @@ def predict_file(
             features=this_features,
             labels=this_labels,
             aggregator="mean",
-            cache="./cache"
+            cache=CACHE,
         ).with_format("numpy")["__prediction__"].flatten()
         print(prediction)
         this_col = f"{species}: predicted MIC (µM)"
         prediction_df[this_col] = np.power(10., -prediction) * 1e6
         prediction_cols.append(this_col)
+        this_col = f"{species}: predicted MIC (µg / mL)"
+        prediction_df[this_col] = np.power(10., -prediction) * 1e3 * prediction_df["mwt"]
+        prediction_cols.append(this_col)
 
         for extra_metric in extra_metrics:
+            message = f"Calculating {extra_metric} for species: {species}"
+            print_err(message)
+            gr.Info(message, duration=10)
             # this_modelbox._input_training_data = this_modelbox._input_training_data.remove_columns([this_modelbox._in_key])
             this_col = f"{species}: {extra_metric}"
             prediction_cols.append(this_col)
@@ -251,7 +265,7 @@ def predict_file(
             )
             prediction_df[this_col] = this_extra[this_extra.column_names[-1]]
 
-    return prediction_df[['id'] + prediction_cols + ['smiles', 'inchikey', "mwt", "clogp"]]
+    return prediction_df[['id'] + [column] + prediction_cols + ['smiles', 'inchikey', "mwt", "clogp"]]
 
 def draw_one(
     strings: Union[Iterable[str], str],
@@ -308,7 +322,7 @@ with gr.Blocks() as demo:
             interactive=True,
         )
         extra_metric = gr.CheckboxGroup(
-            label="Extra metrics (can increase calculation time!)",
+            label="Extra metrics (Information Sensitivity can increase calculation time!)",
             choices=list(EXTRA_METRICS),
             value=list(EXTRA_METRICS)[:2],
             interactive=True,
@@ -392,7 +406,7 @@ with gr.Blocks() as demo:
             outputs=download_single
         )
 
-    with gr.Tab("Predict on structures from a file (max. 1000 rows)"):
+    with gr.Tab("Predict on structures from a file (max. 1000 rows, single species)"):
         input_file = gr.File(
             label="Upload a table of chemical compounds here",
             file_types=[".xlsx", ".csv", ".tsv", ".txt"],
@@ -409,21 +423,25 @@ with gr.Blocks() as demo:
                 value="smiles",
                 interactive=True,
             )
-        output_species = gr.CheckboxGroup(
+        output_species = gr.Radio(
             label="Species for prediction",
             choices=list(MODEL_REPOS),
-            value=list(MODEL_REPOS)[:1],
+            value=list(MODEL_REPOS)[0],
             interactive=True,
         )
         extra_metric_file = gr.CheckboxGroup(
-            label="Extra metrics (can increase calculation time!)",
+            label="Extra metrics (Information Sensitivity can increase calculation time)",
             choices=list(EXTRA_METRICS),
             value=list(EXTRA_METRICS)[:2],
             interactive=True,
         )
-        examples = gr.Examples(
+        file_examples = gr.Examples(
             examples=[
-                ["example-data/stokes2020-eco-1000.csv", "SMILES", "Klebsiella pneumoniae", list(EXTRA_METRICS)[:2]],
+                [
+                    "example-data/stokes2020-eco-1000.csv", 
+                    "SMILES", 
+                    "Klebsiella pneumoniae", 
+                    list(EXTRA_METRICS)[:2]],
             ],
             example_labels=[
                 "Stokes J. et al., Cell, 2020"
@@ -436,7 +454,7 @@ with gr.Blocks() as demo:
         )
 
         download = gr.DownloadButton(
-            label="Download converted data",
+            label="Download predictions",
             visible=False,
         )
         input_data = gr.Dataframe(
@@ -446,6 +464,11 @@ with gr.Blocks() as demo:
             interactive=False,
         )
         
+        file_examples.load_input_event.then(
+            load_input_data, 
+            inputs=[input_file], 
+            outputs=[input_data, input_column],
+        )
         input_file.upload(
             load_input_data, 
             inputs=[input_file], 
