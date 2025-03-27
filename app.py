@@ -1,6 +1,7 @@
 """Gradio demo for schemist."""
 
 from typing import Iterable, List, Optional, Union
+from functools import partial
 from io import TextIOWrapper
 import os
 # os.environ["COMMANDLINE_ARGS"] = "--no-gradio-queue"
@@ -14,7 +15,6 @@ import numpy as np
 import pandas as pd
 from rdkit.Chem import Draw, Mol
 from schemist.converting import (
-    _TO_FUNCTIONS,
     _FROM_FUNCTIONS, 
     convert_string_representation, 
     _x2mol,
@@ -40,14 +40,19 @@ EXTRA_METRICS = {
     "Information sensitivity (approx.)": lambda modelbox, candidates: modelbox.information_sensitivity(candidates=candidates, optimality_approximation=True, approximator="squared_jacobian", cache=CACHE).map(lambda x: {"information sensitivity": torch.log10(x["information sensitivity"])}),
 }
 
+def get_dropdown_options(df, _type = str):
+    if _type == str:
+        cols = list(df.select_dtypes(exclude=[np.number]))
+    else:
+        cols = list(df.select_dtypes([np.number]))
+    return gr.Dropdown(choices=cols, interactive=True, value=cols[0], visible=True)
+
 def load_input_data(file: Union[TextIOWrapper, str]) -> pd.DataFrame:
     file = file if isinstance(file, str) else file.name
     print_err(f"Loading {file}")
     df = read_table(file)
     print_err(df.head())
-    string_cols = list(df.select_dtypes(exclude=[np.number]))
-    df = gr.Dataframe(value=df, visible=True)
-    return df, gr.Dropdown(choices=string_cols, interactive=True, value=string_cols[0])
+    return gr.Dataframe(value=df, visible=True), get_dropdown_options(df, str)
     
 
 def _clean_split_input(strings: str) -> List[str]:
@@ -203,6 +208,7 @@ def predict_file(
         extra_metrics = []
     else:
         extra_metrics = cast(extra_metrics, to=list)
+
     prediction_df = convert_file(
         df,
         column=column,
@@ -264,8 +270,9 @@ def predict_file(
                 .with_format("numpy")
             )
             prediction_df[this_col] = this_extra[this_extra.column_names[-1]]
+    other_cols = [col for col in prediction_df if col not in ['id', 'inchikey', 'smiles', "mwt", "clogp"] + [column] + prediction_cols]
 
-    return prediction_df[['id'] + [column] + prediction_cols + ['smiles', 'inchikey', "mwt", "clogp"]]
+    return prediction_df[['id', 'inchikey'] + [column] + prediction_cols + other_cols + ['smiles', "mwt", "clogp"]]
 
 def draw_one(
     strings: Union[Iterable[str], str],
@@ -284,6 +291,39 @@ def draw_one(
         molsPerRow=min(3, len(mols)), 
         subImgSize=(450, 450),
         legends=["\n".join(items) for items in zip(*_ids.values())],
+    )
+
+
+def plot_pred_vs_observed(
+    df,
+    species: str,
+    observed: str,
+    color: Optional[str] = None,
+):  
+    print_err(df.head())
+    xcol = f"{species}: predicted MIC (µM)"
+    ycol = observed
+    y_title = f"Observed ({ycol})"
+    cols = ["id", "inchikey", "smiles", "mwt", "clogp", xcol, ycol]
+    color_title = color
+    if color is not None and color not in cols:
+        cols.append(color)
+    cols = list(set(cols))
+    print_err(df[cols].columns)
+    if np.all(df[xcol] > 0):
+        df[xcol] = np.log10(df[xcol])
+        x_title = f"Predicted log10[MIC(µM)]"
+
+    return gr.ScatterPlot(
+        value=df[cols],
+        x=xcol,
+        y=ycol,
+        color=color,
+        x_title=x_title,
+        y_title=y_title,
+        color_title=color_title,
+        tooltip="all",
+        visible=True,
     )
 
 
@@ -333,21 +373,25 @@ with gr.Blocks() as demo:
                     '\n'.join([
                         "C1CC1N2C=C(C(=O)C3=CC(=C(C=C32)N4CCNCC4)F)C(=O)O",
                         "CN1C(=NC(=O)C(=O)N1)SCC2=C(N3[C@@H]([C@@H](C3=O)NC(=O)/C(=N\OC)/C4=CSC(=N4)N)SC2)C(=O)O",
+                        "CC(C)(C(=O)O)O/N=C(/C1=CSC(=N1)N)\C(=O)N[C@H]2[C@@H]3N(C2=O)C(=C(CS3)C[N+]4(CCCC4)CCNC(=O)C5=C(C(=C(C=C5)O)O)Cl)C(=O)[O-]",
                         "CC(=O)NC[C@H]1CN(C(=O)O1)C2=CC(=C(C=C2)N3CCOCC3)F",
                         "C1CC2=CC(=NC=C2OC1)CNC3CCN(CC3)C[C@@H]4CN5C(=O)C=CC6=C5N4C(=O)C=N6",
                     ]), 
                     list(MODEL_REPOS)[0],
                     list(EXTRA_METRICS)[:2],
-                 ],  # cipro, ceftriaxone, linezolid, gepotidacin
+                 ],  # cipro, ceftriaxone, cefiderocol, linezolid, gepotidacin
                 [
                     '\n'.join([
                         "C[C@H]1[C@H]([C@H](C[C@@H](O1)O[C@H]2C[C@@](CC3=C2C(=C4C(=C3O)C(=O)C5=C(C4=O)C(=CC=C5)OC)O)(C(=O)CO)O)N)O",
                         "CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)[C@@H](C3=CC=CC=C3)N)C(=O)O)C",
                         "CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)[C@@H](C3=CC=C(C=C3)O)N)C(=O)O)C", 
+                        "C[C@@H]1[C@@H]2[C@H](C(=O)N2C(=C1S[C@H]3C[C@H](NC3)C(=O)N(C)C)C(=O)O)[C@@H](C)O",
+                        "C[C@@]1([C@H]2C[C@H]3[C@@H](C(=O)C(=C([C@]3(C(=O)C2=C(C4=C1C=CC=C4O)O)O)O)C(=O)N)N(C)C)O",
+                        "CC1=C2C=CC=C(C2=C(C3=C1C[C@H]4[C@@H](C(=O)C(=C([C@]4(C3=O)O)O)C(=O)N)N(C)C)O)O",
                     ]), 
                     list(MODEL_REPOS)[0],
                     list(EXTRA_METRICS)[:2],
-                ],  # doxorubicin, ampicillin, amoxicillin
+                ],  # doxorubicin, ampicillin, amoxicillin, meropenem, tetracycline, anhydrotetracycline
                 [
                     '\n'.join([
                         "C1=C(SC(=N1)SC2=NN=C(S2)N)[N+](=O)[O-]",
@@ -359,11 +403,36 @@ with gr.Blocks() as demo:
                     list(MODEL_REPOS)[0],
                     list(EXTRA_METRICS)[:2],
                 ],  # Halicin, Abaucin, Trimethoprim, Sulfamethoxazole, Amikacin, Isoniazid
+                [
+                     '\n'.join([
+                        "CC[C@H](C)[C@H]1C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N2CCC[C@@H]2C(=O)N3CCC[C@H]3C(=O)N[C@H](C(=O)N[C@H](C(=O)N1)CC4=CNC5=CC=CC=C54)[C@@H](C)O)CO)C)CCN)CCN)CC6=CNC7=CC=CC=C76)CCN)CCN)CCCN)CCN",
+                        "C[C@H]1[C@H]([C@@](C[C@@H](O1)O[C@@H]2[C@H]([C@@H]([C@H](O[C@H]2OC3=C4C=C5C=C3OC6=C(C=C(C=C6)[C@H]([C@H](C(=O)N[C@H](C(=O)N[C@H]5C(=O)N[C@@H]7C8=CC(=C(C=C8)O)C9=C(C=C(C=C9O)O)[C@H](NC(=O)[C@H]([C@@H](C1=CC(=C(O4)C=C1)Cl)O)NC7=O)C(=O)O)CC(=O)N)NC(=O)[C@@H](CC(C)C)NC)O)Cl)CO)O)O)(C)N)O",
+                        "CN1[C@H](C(=O)NCC2=C(C=CC=C2SC3=C(CN[C@H](C(=O)N[C@H](C1=O)CCCCN)CCCN)C=CC=N3)C4=CC=C(C=C4)C(=O)O)CC5=CNC6=CC=CC=C65", 
+                        "C[C@@]1(CO[C@@H]([C@@H]([C@H]1NC)O)O[C@H]2[C@@H](C[C@@H]([C@H]([C@@H]2O)O[C@@H]3[C@@H](CC=C(O3)CNCCO)N)N)NC(=O)[C@H](CCN)O)O",
+                        "CC(C1CCC(C(O1)OC2C(CC(C(C2O)OC3C(C(C(CO3)(C)O)NC)O)N)N)N)NC",
+                        "C[C@H]1/C=C/C=C(\C(=O)NC2=C(C(=C3C(=C2O)C(=C(C4=C3C(=O)[C@](O4)(O/C=C/[C@@H]([C@H]([C@H]([C@@H]([C@@H]([C@@H]([C@H]1O)C)O)C)OC(=O)C)C)OC)C)C)O)O)/C=N/N5CCN(CC5)C)/C",
+                    ]), 
+                    list(MODEL_REPOS)[0],
+                    list(EXTRA_METRICS)[:2],
+                ],  # murepavadin, vancomycin, zosurabalpin, plazomicin, Gentamicin, rifampicin
+                [
+                     '\n'.join([
+                        "CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)CC4)N=C3",
+                        "CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)[C@@H](C4)N)N=C3",
+                        "CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)[C@H](CC4)[NH3+])N=C3.[Cl-]",
+                    ]), 
+                    list(MODEL_REPOS)[0],
+                    list(EXTRA_METRICS)[:2],
+                ],  # Debio1452, Debio-1452-NH3, Fabimycin, 
+
             ],
             example_labels=[
-                "Ciprofloxacin, Ceftriaxone, Linezolid, Gepotidacin",
-                "Doxorubicin, Ampicillin, Amoxicillin",
-                "Halicin, Abaucin, Trimethoprim, Sulfamethoxazole, Amikacin, Isoniazid"
+                "Ciprofloxacin, Ceftriaxone, Cefiderocol, Linezolid, Gepotidacin",
+                "Doxorubicin, Ampicillin, Amoxicillin, Meropenem, Tetracycline, Anhydrotetracycline",
+                "Halicin, Abaucin, Trimethoprim, Sulfamethoxazole, Amikacin, Isoniazid",
+                "Murepavadin, Vancomycin, Zosurabalpin, Plazomicin, Gentamicin, Rifampicin",
+                "Debio-1452, Debio-1452-NH3, Fabimycin",
+
             ],
             inputs=[input_line, output_species_single, extra_metric],
             cache_mode="eager",
@@ -379,6 +448,7 @@ with gr.Blocks() as demo:
             visible=False,
         )
         drawing = gr.Image(label="Chemical structures")
+
         gr.on(
             [
                 input_line.submit,
@@ -416,12 +486,14 @@ with gr.Blocks() as demo:
                 label="Input column name",
                 choices=[],
                 allow_custom_value=True,
+                visible=False,
             )
             input_format = gr.Dropdown(
                 label="Input string format",
                 choices=list(_FROM_FUNCTIONS),
                 value="smiles",
                 interactive=True,
+                visible=True,
             )
         output_species = gr.Radio(
             label="Species for prediction",
@@ -435,20 +507,7 @@ with gr.Blocks() as demo:
             value=list(EXTRA_METRICS)[:2],
             interactive=True,
         )
-        file_examples = gr.Examples(
-            examples=[
-                [
-                    "example-data/stokes2020-eco-1000.csv", 
-                    "SMILES", 
-                    "Klebsiella pneumoniae", 
-                    list(EXTRA_METRICS)[:2]],
-            ],
-            example_labels=[
-                "Stokes J. et al., Cell, 2020"
-            ],
-            inputs=[input_file, input_column, output_species, extra_metric_file],
-            cache_mode="eager",
-        )
+        
         go_button2 = gr.Button(
             value="Predict!",
         )
@@ -462,6 +521,48 @@ with gr.Blocks() as demo:
             max_height=500,
             visible=False,
             interactive=False,
+        )
+        with gr.Row():
+            observed_col = gr.Dropdown(
+                label="Observed column (y-axis) for comparison plot",
+                choices=[],
+                value=None,
+                interactive=True,
+                visible=False,
+            )
+            color_col = gr.Dropdown(
+                label="Color for comparison plot",
+                choices=[],
+                value=None,
+                interactive=True,
+                visible=False,
+            )
+        plot_button = gr.Button(
+            value="Plot!",
+            visible=False,
+        )
+        file_examples = gr.Examples(
+            examples=[
+                [
+                    "example-data/stokes2020-eco-1000.csv", 
+                    "SMILES", 
+                    "Klebsiella pneumoniae",
+                    "Mean_Inhibition",
+                    "Klebsiella pneumoniae: Doubtscore",
+                    list(EXTRA_METRICS)[:3]],
+            ],
+            example_labels=[
+                "Stokes J. et al., Cell, 2020",
+            ],
+            inputs=[input_file, input_column, output_species, observed_col, color_col, extra_metric_file],
+            cache_mode="eager",
+        )
+        pred_vs_observed = gr.ScatterPlot(
+            label="Prediction vs observed", 
+            x_title="Predicted MIC (µM)",
+            y_title="Observed",
+            visible=False,
+            height=600,
         )
         
         file_examples.load_input_event.then(
@@ -490,6 +591,28 @@ with gr.Blocks() as demo:
             download_table,
             inputs=input_data,
             outputs=download
+        ).then(
+            partial(get_dropdown_options, _type="number"),
+            inputs=[input_data],
+            outputs=[observed_col],
+        ).then(
+            partial(get_dropdown_options, _type="number"),
+            inputs=[input_data],
+            outputs=[color_col],
+        ).then(
+            lambda: gr.Button(visible=True),
+            outputs=[plot_button],
+        )
+
+        plot_button.click(
+            plot_pred_vs_observed,
+            inputs=[
+                input_data,
+                output_species,
+                observed_col,
+                color_col,
+            ],
+            outputs=pred_vs_observed,
         )
 
 if __name__ == "__main__":
