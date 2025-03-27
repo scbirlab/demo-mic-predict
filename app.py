@@ -423,7 +423,7 @@ with gr.Blocks() as demo:
         )
         examples = gr.Examples(
             examples=[
-                ["example-data/stokes2020-eco.csv", "SMILES", "Klebsiella pneumoniae", list(EXTRA_METRICS)[:2]],
+                ["example-data/stokes2020-eco-1000.csv", "SMILES", "Klebsiella pneumoniae", list(EXTRA_METRICS)[:2]],
             ],
             example_labels=[
                 "Stokes J. et al., Cell, 2020"
