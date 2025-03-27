@@ -43,7 +43,7 @@ def load_input_data(file: TextIOWrapper) -> pd.DataFrame:
     df = read_table(file.name)
     string_cols = list(df.select_dtypes(exclude=[np.number]))
     df = gr.Dataframe(value=df, visible=True)
-    return df, gr.Dropdown(choices=string_cols, interactive=True)
+    return df, gr.Dropdown(choices=string_cols, interactive=True, value=string_cols[0])
     
 
 def _clean_split_input(strings: str) -> List[str]:
@@ -95,7 +95,7 @@ def predict_one(
     prediction_df = convert_one(
         strings=strings,
         input_representation=input_representation,
-        output_representation=['id', 'pubhem_name', 'pubchem_id', 'smiles', 'inchikey', "mwt", "clogp"],
+        output_representation=['id', 'pubchem_name', 'pubchem_id', 'smiles', 'inchikey', "mwt", "clogp"],
     )
     species_to_predict = cast(predict, to=list)
     prediction_cols = []
@@ -125,8 +125,14 @@ def predict_one(
         this_col = f"{species}: predicted MIC (µM)"
         prediction_df[this_col] = np.power(10., -prediction) * 1e6
         prediction_cols.append(this_col)
+        this_col = f"{species}: predicted MIC (µg / mL)"
+        prediction_df[this_col] = np.power(10., -prediction) * 1e3 * prediction_df["mwt"]
+        prediction_cols.append(this_col)
 
         for extra_metric in extra_metrics:
+            message = f"Calculating {extra_metric} for species: {species}"
+            print_err(message)
+            gr.Info(message, duration=10)
             # this_modelbox._input_training_data = this_modelbox._input_training_data.remove_columns([this_modelbox._in_key])
             this_col = f"{species}: {extra_metric}"
             prediction_cols.append(this_col)
@@ -143,7 +149,7 @@ def predict_one(
             prediction_df[this_col] = this_extra[this_extra.column_names[-1]]
         
     return gr.DataFrame(
-        prediction_df[['id', 'pubhem_name', 'pubhem_id'] + prediction_cols + ['smiles', 'inchikey', "mwt", "clogp"]],
+        prediction_df[['id', 'pubchem_name', 'pubchem_id'] + prediction_cols + ['smiles', 'inchikey', "mwt", "clogp"]],
         visible=True
     )
 
@@ -352,13 +358,13 @@ with gr.Blocks() as demo:
             label="Download predictions",
             visible=False,
         )
-        with gr.Row():
-            output_line = gr.DataFrame(
-                label="Predictions",
-                interactive=False,
-                visible=False,
-            )
-            drawing = gr.Image(label="Chemical structures")
+        # with gr.Row():
+        output_line = gr.DataFrame(
+            label="Predictions",
+            interactive=False,
+            visible=False,
+        )
+        drawing = gr.Image(label="Chemical structures")
         gr.on(
             [
                 input_line.submit,
@@ -386,7 +392,7 @@ with gr.Blocks() as demo:
             outputs=download_single
         )
 
-    with gr.Tab("Convert a file (max. 1000 rows)"):
+    with gr.Tab("Predict on structures from a file (max. 1000 rows)"):
         input_file = gr.File(
             label="Upload a table of chemical compounds here",
             file_types=[".xlsx", ".csv", ".tsv", ".txt"],
@@ -395,6 +401,7 @@ with gr.Blocks() as demo:
             input_column = gr.Dropdown(
                 label="Input column name",
                 choices=[],
+                allow_custom_value=True,
             )
             input_format = gr.Dropdown(
                 label="Input string format",
@@ -413,6 +420,16 @@ with gr.Blocks() as demo:
             choices=list(EXTRA_METRICS),
             value=list(EXTRA_METRICS)[:2],
             interactive=True,
+        )
+        examples = gr.Examples(
+            examples=[
+                ["example-data/stokes2020-eco.csv", "SMILES", "Klebsiella pneumoniae", list(EXTRA_METRICS)[:2]],
+            ],
+            example_labels=[
+                "Stokes J. et al., Cell, 2020"
+            ],
+            inputs=[input_file, input_column, output_species, extra_metric_file],
+            cache_mode="eager",
         )
         go_button2 = gr.Button(
             value="Predict!",
