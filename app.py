@@ -23,6 +23,7 @@ from schemist.tables import converter
 import torch
 
 CACHE = "./cache"
+MAX_ROWS = 4000
 HEADER_FILE = os.path.join("sources", "header.md")
 MODEL_REPOS = {
     "Klebsiella pneumoniae": "hf://scbirlab/spark-dv-fp-2503-kpn",
@@ -78,6 +79,10 @@ def convert_one(
     input_representation: str = 'smiles', 
     output_representation: Union[Iterable[str], str] = 'smiles'
 ):
+    output_representation = cast(output_representation, to=list)
+    for rep in output_representation:
+        message = f"Converting from {input_representation} to {rep}..."
+        gr.Info(message, duration=10)
 
     df = pd.DataFrame({
         input_representation: _clean_split_input(strings),
@@ -91,23 +96,17 @@ def convert_one(
     )
 
 
-def predict_one(
-    strings: str,
-    input_representation: str = 'smiles', 
+def _prediction_loop(
+    df: pd.DataFrame,
     predict: Union[Iterable[str], str] = 'smiles', 
     extra_metrics: Optional[Union[Iterable[str], str]] = None
-):
+) -> pd.DataFrame:
+    species_to_predict = cast(predict, to=list)
+    prediction_cols = []
     if extra_metrics is None:
         extra_metrics = []
     else:
         extra_metrics = cast(extra_metrics, to=list)
-    prediction_df = convert_one(
-        strings=strings,
-        input_representation=input_representation,
-        output_representation=['id', 'pubchem_name', 'pubchem_id', 'smiles', 'inchikey', "mwt", "clogp"],
-    )
-    species_to_predict = cast(predict, to=list)
-    prediction_cols = []
     for species in species_to_predict:
         message = f"Predicting for species: {species}"
         print_err(message)
@@ -116,7 +115,7 @@ def predict_one(
         this_features = this_modelbox._input_cols
         this_labels = this_modelbox._label_cols
         this_prediction_input = (
-            prediction_df
+            df
             .rename(columns={
                 "smiles": this_features[0],
             })
@@ -132,10 +131,10 @@ def predict_one(
         ).with_format("numpy")["__prediction__"].flatten()
         print(prediction)
         this_col = f"{species}: predicted MIC (µM)"
-        prediction_df[this_col] = np.power(10., -prediction) * 1e6
+        df[this_col] = np.power(10., -prediction) * 1e6
         prediction_cols.append(this_col)
         this_col = f"{species}: predicted MIC (µg / mL)"
-        prediction_df[this_col] = np.power(10., -prediction) * 1e3 * prediction_df["mwt"]
+        df[this_col] = np.power(10., -prediction) * 1e3 * df["mwt"]
         prediction_cols.append(this_col)
 
         for extra_metric in extra_metrics:
@@ -155,10 +154,33 @@ def predict_one(
                 )
                 .with_format("numpy")
             )
-            prediction_df[this_col] = this_extra[this_extra.column_names[-1]]
-        
+            df[this_col] = this_extra[this_extra.column_names[-1]]
+
+    return prediction_cols, df
+
+
+def predict_one(
+    strings: str,
+    input_representation: str = 'smiles', 
+    predict: Union[Iterable[str], str] = 'smiles', 
+    extra_metrics: Optional[Union[Iterable[str], str]] = None
+):
+    prediction_df = convert_one(
+        strings=strings,
+        input_representation=input_representation,
+        output_representation=['id', 'pubchem_name', 'pubchem_id', 'smiles', 'inchikey', "mwt", "clogp"],
+    )
+    prediction_cols, prediction_df = _prediction_loop(
+        prediction_df,
+        predict=predict,
+        extra_metrics=extra_metrics,
+    )
     return gr.DataFrame(
-        prediction_df[['id', 'pubchem_name', 'pubchem_id'] + prediction_cols + ['smiles', 'inchikey', "mwt", "clogp"]],
+        prediction_df[
+            ['id', 'pubchem_name', 'pubchem_id'] 
+            + prediction_cols 
+            + ['smiles', 'inchikey', "mwt", "clogp"]
+        ],
         visible=True
     )
 
@@ -209,70 +231,38 @@ def predict_file(
     else:
         extra_metrics = cast(extra_metrics, to=list)
 
+    if df.shape[0] > MAX_ROWS:
+        message = f"Truncating input to {MAX_ROWS} rows"
+        print_err(message)
+        gr.Info(message, duration=15)
+        df = df.iloc[:MAX_ROWS]
+
     prediction_df = convert_file(
         df,
         column=column,
         input_representation=input_representation,
         output_representation=["id", "smiles", "inchikey", "mwt", "clogp"],
     )
-    if prediction_df.shape[0] > 1000:
-        message = f"Truncating input to 1000 rows"
-        print_err(message)
-        gr.Info(message, duration=15)
-        prediction_df = prediction_df.iloc[:1000]
-    species_to_predict = cast(predict, to=list)
-    prediction_cols = []
-    for species in species_to_predict:
-        message = f"Predicting for species: {species}"
-        print_err(message)
-        gr.Info(message, duration=3)
-        this_modelbox = MODELBOXES[species]
-        this_features = this_modelbox._input_cols
-        this_labels = this_modelbox._label_cols
-        this_prediction_input = (
-            prediction_df
-            .rename(columns={
-                "smiles": this_features[0],
-            })
-            .assign(**{label: np.nan for label in this_labels})
-        )
-        print(this_prediction_input)
-        prediction = this_modelbox.predict(
-            data=this_prediction_input,
-            features=this_features,
-            labels=this_labels,
-            aggregator="mean",
-            cache=CACHE,
-        ).with_format("numpy")["__prediction__"].flatten()
-        print(prediction)
-        this_col = f"{species}: predicted MIC (µM)"
-        prediction_df[this_col] = np.power(10., -prediction) * 1e6
-        prediction_cols.append(this_col)
-        this_col = f"{species}: predicted MIC (µg / mL)"
-        prediction_df[this_col] = np.power(10., -prediction) * 1e3 * prediction_df["mwt"]
-        prediction_cols.append(this_col)
-
-        for extra_metric in extra_metrics:
-            message = f"Calculating {extra_metric} for species: {species}"
-            print_err(message)
-            gr.Info(message, duration=10)
-            # this_modelbox._input_training_data = this_modelbox._input_training_data.remove_columns([this_modelbox._in_key])
-            this_col = f"{species}: {extra_metric}"
-            prediction_cols.append(this_col)
-            print(">>>", this_modelbox._input_training_data)
-            print(">>>", this_modelbox._input_training_data.format)
-            print(">>>", this_modelbox._in_key, this_modelbox._out_key)
-            this_extra = (
-                EXTRA_METRICS[extra_metric](
-                    this_modelbox,
-                    this_prediction_input,
-                )
-                .with_format("numpy")
-            )
-            prediction_df[this_col] = this_extra[this_extra.column_names[-1]]
-    other_cols = [col for col in prediction_df if col not in ['id', 'inchikey', 'smiles', "mwt", "clogp"] + [column] + prediction_cols]
-
-    return prediction_df[['id', 'inchikey'] + [column] + prediction_cols + other_cols + ['smiles', "mwt", "clogp"]]
+    prediction_cols, prediction_df = _prediction_loop(
+        prediction_df,
+        predict=predict,
+        extra_metrics=extra_metrics,
+    )
+    main_cols = set(
+        ['id', 'inchikey', 'smiles', "mwt", "clogp"] 
+        + [column] 
+        + prediction_cols
+    )
+    other_cols = [
+        col for col in prediction_df 
+        if col not in main_cols
+    ]
+    return prediction_df[
+        ['id', 'inchikey'] 
+        + [column] 
+        + prediction_cols + other_cols 
+        + ['smiles', "mwt", "clogp"]
+    ]
 
 def draw_one(
     strings: Union[Iterable[str], str],
@@ -293,6 +283,43 @@ def draw_one(
         legends=["\n".join(items) for items in zip(*_ids.values())],
     )
 
+def log10_if_all_positive(df, col):
+    if np.all(df[col] > 0.):
+        df[col] = np.log10(df[col])
+        title = f"log10[ {col} ]"
+    else:
+        title = col
+    return title, df
+
+
+def plot_x_vs_y(
+    df,
+    x: str,
+    y: str,
+    color: Optional[str] = None,
+):  
+    print_err(df.head())
+    y_title = y
+    cols = ["id", "inchikey", "smiles", "mwt", "clogp", x, y]
+    if color is not None and color not in cols:
+        cols.append(color)
+    cols = list(set(cols))
+    x_title, df = log10_if_all_positive(df, x)
+    y_title, df = log10_if_all_positive(df, y)
+    color_title, df = log10_if_all_positive(df, color)
+
+    return gr.ScatterPlot(
+        value=df[cols],
+        x=x,
+        y=y,
+        color=color,
+        x_title=x_title,
+        y_title=y_title,
+        color_title=color_title,
+        tooltip="all",
+        visible=True,
+    )
+
 
 def plot_pred_vs_observed(
     df,
@@ -303,37 +330,22 @@ def plot_pred_vs_observed(
     print_err(df.head())
     xcol = f"{species}: predicted MIC (µM)"
     ycol = observed
-    y_title = f"Observed ({ycol})"
-    cols = ["id", "inchikey", "smiles", "mwt", "clogp", xcol, ycol]
-    color_title = color
-    if color is not None and color not in cols:
-        cols.append(color)
-    cols = list(set(cols))
-    print_err(df[cols].columns)
-    if np.all(df[xcol] > 0):
-        df[xcol] = np.log10(df[xcol])
-        x_title = f"Predicted log10[MIC(µM)]"
-
-    return gr.ScatterPlot(
-        value=df[cols],
+    return plot_x_vs_y(
+        df,
         x=xcol,
         y=ycol,
         color=color,
-        x_title=x_title,
-        y_title=y_title,
-        color_title=color_title,
-        tooltip="all",
-        visible=True,
-    )
+    ) 
 
 
 def download_table(
     df: pd.DataFrame
 ) -> str:
     df_hash = nm.hash(pd.util.hash_pandas_object(df).values)
-    filename = f"converted-{df_hash}.csv"
+    filename = f"predicted-{df_hash}.csv"
     df.to_csv(filename, index=False)
     return gr.DownloadButton(value=filename, visible=True)
+
 
 with gr.Blocks() as demo:
 
@@ -379,7 +391,7 @@ with gr.Blocks() as demo:
                     ]), 
                     list(MODEL_REPOS)[0],
                     list(EXTRA_METRICS)[:2],
-                 ],  # cipro, ceftriaxone, cefiderocol, linezolid, gepotidacin
+                ],  # cipro, ceftriaxone, cefiderocol, linezolid, gepotidacin
                 [
                     '\n'.join([
                         "C[C@H]1[C@H]([C@H](C[C@@H](O1)O[C@H]2C[C@@](CC3=C2C(=C4C(=C3O)C(=O)C5=C(C4=O)C(=CC=C5)OC)O)(C(=O)CO)O)N)O",
@@ -399,6 +411,7 @@ with gr.Blocks() as demo:
                         "COC1=CC(=CC(=C1OC)OC)CC2=CN=C(N=C2N)N",
                         "CC1=CC(=NO1)NS(=O)(=O)C2=CC=C(C=C2)N",
                         "C1[C@@H]([C@H]([C@@H]([C@H]([C@@H]1NC(=O)[C@H](CCN)O)O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CO)O)N)O)O)O[C@@H]3[C@@H]([C@H]([C@@H]([C@H](O3)CN)O)O)O)N\nC1=CN=CC=C1C(=O)NN", 
+                        "C1=CN=CC=C1C(=O)NN  ",
                     ]), 
                     list(MODEL_REPOS)[0],
                     list(EXTRA_METRICS)[:2],
@@ -420,10 +433,37 @@ with gr.Blocks() as demo:
                         "CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)CC4)N=C3",
                         "CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)[C@@H](C4)N)N=C3",
                         "CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)[C@H](CC4)[NH3+])N=C3.[Cl-]",
+                        "C1=C(C(=O)NC(=O)N1)F",
+                        "CCCCCCNC(=O)N1C=C(C(=O)NC1=O)F",
+                        "C[C@@H]1OC[C@@H]2[C@@H](O1)[C@@H]([C@H]([C@@H](O2)O[C@H]3[C@H]4COC(=O)[C@@H]4[C@@H](C5=CC6=C(C=C35)OCO6)C7=CC(=C(C(=C7)OC)O)OC)O)O",
                     ]), 
                     list(MODEL_REPOS)[0],
                     list(EXTRA_METRICS)[:2],
-                ],  # Debio1452, Debio-1452-NH3, Fabimycin, 
+                ],  # Debio1452, Debio-1452-NH3, Fabimycin, 5-FU, Carmofur, Etoposide
+                [
+                     '\n'.join([
+                        "COC1=CC(=CC(=C1OC)OC)CC2=CN=C(N=C2N)N",
+                        "CC(C)C1=CC=C(C=C1)CN2C=CC3=C2C=CC4=C3C(=NC(=N4)NC5CC5)N",
+                        "C1=CC(=CC=C1CCC2=CNC3=C2C(=O)NC(=N3)N)C(=O)N[C@@H](CCC(=O)O)C(=O)O",
+                        "CC1=C(C2=C(C=C1)N=C(NC2=O)N)SC3=CC=NC=C3",
+                        "CN(CC1=CN=C2C(=N1)C(=NC(=N2)N)N)C3=CC=C(C=C3)C(=O)N[C@@H](CCC(=O)O)C(=O)O",
+                        "CC1=NC2=C(C=C(C=C2)CN(C)C3=CC=C(S3)C(=O)N[C@@H](CCC(=O)O)C(=O)O)C(=O)N1",
+                    ]), 
+                    list(MODEL_REPOS)[0],
+                    list(EXTRA_METRICS)[:2],
+                ],  # Trimethoprim, SCH79797, Pemetrexed, Nolatrexed, Methotrexate, Raltitrexed
+                [
+                     '\n'.join([
+                        "C[C@H]([C@@H](C(=O)NO)NC(=O)C1=CC=C(C=C1)C#CC2=CC=C(C=C2)CN3CCOCC3)O",
+                        "CC(C)C1=CC=C(C=C1)CN2C=CC3=C2C=CC4=C3C(=NC(=N4)NC5CC5)N",
+                        "C1=CC=C(C=C1)CNC2=NC(=NC3=CC=CC=C32)NCC4=CC=CC=C4",
+                        "CC(C)(C)C1=CC=C(C=C1)C(=O)NC(=S)NC2=CC=C(C=C2)NC(=O)CCCCN(C)C",
+                        "CCC1=C(C(=NC(=N1)N)N)C2=CC=C(C=C2)Cl",
+                        "C1=CC(=CC=C1C(=O)N[C@@H](CCC(=O)O)C(=O)O)NCC2=CN=C3C(=N2)C(=NC(=N3)N)N",
+                    ]), 
+                    list(MODEL_REPOS)[0],
+                    list(EXTRA_METRICS)[:2],
+                ],  # CHIR-090, SCH79797, DBeQ, Tenovin-6, Pyrimethamine, Aminopterin
 
             ],
             example_labels=[
@@ -431,8 +471,9 @@ with gr.Blocks() as demo:
                 "Doxorubicin, Ampicillin, Amoxicillin, Meropenem, Tetracycline, Anhydrotetracycline",
                 "Halicin, Abaucin, Trimethoprim, Sulfamethoxazole, Amikacin, Isoniazid",
                 "Murepavadin, Vancomycin, Zosurabalpin, Plazomicin, Gentamicin, Rifampicin",
-                "Debio-1452, Debio-1452-NH3, Fabimycin",
-
+                "Debio-1452, Debio-1452-NH3, Fabimycin, 5-FU, Carmofur, Etoposide",
+                "Trimethoprim, Pemetrexed,  Nolatrexed, Methotrexate, Raltitrexed",
+                "CHIR-090, SCH79797, DBeQ, Tenovin-6, Pyrimethamine, Aminopterin"
             ],
             inputs=[input_line, output_species_single, extra_metric],
             cache_mode="eager",
@@ -476,7 +517,7 @@ with gr.Blocks() as demo:
             outputs=download_single
         )
 
-    with gr.Tab("Predict on structures from a file (max. 1000 rows, single species)"):
+    with gr.Tab(f"Predict on structures from a file (max. {MAX_ROWS} rows, single species)"):
         input_file = gr.File(
             label="Upload a table of chemical compounds here",
             file_types=[".xlsx", ".csv", ".tsv", ".txt"],
@@ -524,14 +565,36 @@ with gr.Blocks() as demo:
         )
         with gr.Row():
             observed_col = gr.Dropdown(
-                label="Observed column (y-axis) for comparison plot",
+                label="Observed column (y-axis) for left plot",
                 choices=[],
                 value=None,
                 interactive=True,
                 visible=False,
             )
             color_col = gr.Dropdown(
-                label="Color for comparison plot",
+                label="Color for left plot",
+                choices=[],
+                value=None,
+                interactive=True,
+                visible=False,
+            )
+
+            any_x_col = gr.Dropdown(
+                label="x-axis for right plot",
+                choices=[],
+                value=None,
+                interactive=True,
+                visible=False,
+            )
+            any_y_col = gr.Dropdown(
+                label="y-axis for right plot",
+                choices=[],
+                value=None,
+                interactive=True,
+                visible=False,
+            )
+            any_color_col = gr.Dropdown(
+                label="Color for right plot",
                 choices=[],
                 value=None,
                 interactive=True,
@@ -544,38 +607,65 @@ with gr.Blocks() as demo:
         file_examples = gr.Examples(
             examples=[
                 [
-                    "example-data/stokes2020-eco-1000.csv", 
+                    "example-data/stokes2020-eco.csv", 
                     "SMILES", 
                     "Klebsiella pneumoniae",
                     "Mean_Inhibition",
                     "Klebsiella pneumoniae: Doubtscore",
-                    list(EXTRA_METRICS)[:3]],
+                    list(EXTRA_METRICS)[:3],
+                ],
+                [
+                    "example-data/liu23-abau.csv", 
+                    "SMILES", 
+                    "Klebsiella pneumoniae",
+                    "Mean",
+                    "Klebsiella pneumoniae: Doubtscore",
+                    list(EXTRA_METRICS)[:3],
+                ],
+                [
+                    "example-data/wong24-sau-tox-5000.csv", 
+                    "SMILES", 
+                    "Klebsiella pneumoniae",
+                    "Mean",
+                    "Klebsiella pneumoniae: Doubtscore",
+                    list(EXTRA_METRICS)[:3],
+                ],
             ],
             example_labels=[
-                "Stokes J. et al., Cell, 2020",
+                "E. coli training data from Stokes J. et al., Cell, 2020",
+                "A. baumannii training data from Liu, 2023",
+                "S. aureus and toxicity training data from Wong, 2024",
             ],
             inputs=[input_file, input_column, output_species, observed_col, color_col, extra_metric_file],
             cache_mode="eager",
         )
-        pred_vs_observed = gr.ScatterPlot(
-            label="Prediction vs observed", 
-            x_title="Predicted MIC (µM)",
-            y_title="Observed",
-            visible=False,
-            height=600,
-        )
+        with gr.Row():
+            pred_vs_observed = gr.ScatterPlot(
+                label="Prediction vs observed", 
+                x_title="Predicted MIC (µM)",
+                y_title="Observed",
+                visible=False,
+                height=600,
+            )
+            plot_any_vs_any = gr.ScatterPlot(
+                label="Any vs any", 
+                visible=False,
+                height=600,
+            )
+
+        load_data_action = {
+            "fn": load_input_data,
+            "inputs": [input_file],
+            "outputs": [input_data, input_column]
+        }
         
         file_examples.load_input_event.then(
-            load_input_data, 
-            inputs=[input_file], 
-            outputs=[input_data, input_column],
+            **load_data_action,
         )
         input_file.upload(
-            load_input_data, 
-            inputs=[input_file], 
-            outputs=[input_data, input_column]
+            **load_data_action,
         )
-        go_button2.click(
+        go2_click_event = go_button2.click(
             predict_file,
             inputs=[
                 input_data, 
@@ -592,17 +682,16 @@ with gr.Blocks() as demo:
             inputs=input_data,
             outputs=download
         ).then(
-            partial(get_dropdown_options, _type="number"),
-            inputs=[input_data],
-            outputs=[observed_col],
-        ).then(
-            partial(get_dropdown_options, _type="number"),
-            inputs=[input_data],
-            outputs=[color_col],
-        ).then(
             lambda: gr.Button(visible=True),
-            outputs=[plot_button],
+            outputs=[plot_button]
         )
+        
+        for dropdown in [observed_col, color_col, any_color_col, any_x_col, any_y_col]:
+            go2_click_event.then(
+                partial(get_dropdown_options, _type="number"),
+                inputs=[input_data],
+                outputs=[dropdown],
+            )
 
         plot_button.click(
             plot_pred_vs_observed,
@@ -612,7 +701,16 @@ with gr.Blocks() as demo:
                 observed_col,
                 color_col,
             ],
-            outputs=pred_vs_observed,
+            outputs=[pred_vs_observed],
+        ).then(
+            plot_x_vs_y,
+            inputs=[
+                input_data,
+                any_x_col,
+                any_y_col,
+                any_color_col,
+            ],
+            outputs=[plot_any_vs_any],
         )
 
 if __name__ == "__main__":
