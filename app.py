@@ -3,6 +3,7 @@
 from typing import Iterable, List, Optional, Union
 from functools import partial
 from io import TextIOWrapper
+import json
 import os
 # os.environ["COMMANDLINE_ARGS"] = "--no-gradio-queue"
 
@@ -22,23 +23,26 @@ from schemist.converting import (
 from schemist.tables import converter
 import torch
 
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 CACHE = "./cache"
 MAX_ROWS = 4000
+BATCH_SIZE=32
 HEADER_FILE = os.path.join("sources", "header.md")
-MODEL_REPOS = {
-    "Klebsiella pneumoniae": "hf://scbirlab/spark-dv-fp-2503-kpn",
-}
+with open("repos.json", "r") as f:
+    MODEL_REPOS = json.load(f)
 
 MODELBOXES = {
     key: AutoModelBox.from_pretrained(val, cache_dir=CACHE)
     for key, val in MODEL_REPOS.items()
 }
+[mb.to(DEVICE) for mb in MODELBOXES.values()]
 
 EXTRA_METRICS = {
-    "log10(variance)": lambda modelbox, candidates: modelbox.prediction_variance(candidates=candidates, cache=CACHE).map(lambda x: {modelbox._variance_key: torch.log10(x[modelbox._variance_key])}), 
-    "Tanimoto nearest neighbor to training data": lambda modelbox, candidates: modelbox.tanimoto_nn(candidates=candidates), 
-    "Doubtscore": lambda modelbox, candidates: modelbox.doubtscore(candidates=candidates, cache=CACHE).map(lambda x: {"doubtscore": torch.log10(x["doubtscore"])}), 
-    "Information sensitivity (approx.)": lambda modelbox, candidates: modelbox.information_sensitivity(candidates=candidates, optimality_approximation=True, approximator="squared_jacobian", cache=CACHE).map(lambda x: {"information sensitivity": torch.log10(x["information sensitivity"])}),
+    "log10(variance)": lambda modelbox, candidates: modelbox.prediction_variance(candidates=candidates, batch_size=BATCH_SIZE, cache=CACHE).map(lambda x: {modelbox._variance_key: torch.log10(x[modelbox._variance_key])}), 
+    "Tanimoto nearest neighbor to training data": lambda modelbox, candidates: modelbox.tanimoto_nn(candidates=candidates, batch_size=BATCH_SIZE), 
+    "Doubtscore": lambda modelbox, candidates: modelbox.doubtscore(candidates=candidates, cache=CACHE, batch_size=BATCH_SIZE).map(lambda x: {"doubtscore": torch.log10(x["doubtscore"])}), 
+    "Information sensitivity (approx.)": lambda modelbox, candidates: modelbox.information_sensitivity(candidates=candidates, batch_size=BATCH_SIZE, optimality_approximation=True, approximator="squared_jacobian", cache=CACHE).map(lambda x: {"information sensitivity": torch.log10(x["information sensitivity"])}),
 }
 
 def get_dropdown_options(df, _type = str):
@@ -47,6 +51,7 @@ def get_dropdown_options(df, _type = str):
     else:
         cols = list(df.select_dtypes([np.number]))
     return gr.Dropdown(choices=cols, interactive=True, value=cols[0], visible=True)
+
 
 def load_input_data(file: Union[TextIOWrapper, str]) -> pd.DataFrame:
     file = file if isinstance(file, str) else file.name
@@ -223,9 +228,13 @@ def predict_file(
     df: pd.DataFrame, 
     column: str = 'smiles',
     input_representation: str = 'smiles',
-    predict: Union[Iterable[str], str] = 'smiles', 
+    predict: str = 'smiles', 
+    predict2: Optional[str] = None, 
     extra_metrics: Optional[Union[Iterable[str], str]] = None
 ):
+    predict = cast(predict, to=list)
+    if predict2 is not None:
+        predict += cast(predict2, to=list)
     if extra_metrics is None:
         extra_metrics = []
     else:
@@ -268,6 +277,8 @@ def draw_one(
     strings: Union[Iterable[str], str],
     input_representation: str = 'smiles'
 ):
+    message = f"Drawing {len(cast(strings, to=list))} molecules..."
+    gr.Info(message, duration=10)
     _ids = _convert_input(
         strings, 
         input_representation, 
@@ -298,6 +309,8 @@ def plot_x_vs_y(
     y: str,
     color: Optional[str] = None,
 ):  
+    message = f"Plotting x={x}, y={y}, color={color}..."
+    gr.Info(message, duration=10)
     print_err(df.head())
     y_title = y
     cols = ["id", "inchikey", "smiles", "mwt", "clogp", x, y]
@@ -374,7 +387,7 @@ with gr.Blocks() as demo:
             interactive=True,
         )
         extra_metric = gr.CheckboxGroup(
-            label="Extra metrics (Information Sensitivity can increase calculation time!)",
+            label="Extra metrics (Doubscore & Information Sensitivity can increase calculation time to a couple of minutes!)",
             choices=list(EXTRA_METRICS),
             value=list(EXTRA_METRICS)[:2],
             interactive=True,
@@ -389,7 +402,7 @@ with gr.Blocks() as demo:
                         "CC(=O)NC[C@H]1CN(C(=O)O1)C2=CC(=C(C=C2)N3CCOCC3)F",
                         "C1CC2=CC(=NC=C2OC1)CNC3CCN(CC3)C[C@@H]4CN5C(=O)C=CC6=C5N4C(=O)C=N6",
                     ]), 
-                    list(MODEL_REPOS)[0],
+                    "Yersinia pestis",
                     list(EXTRA_METRICS)[:2],
                 ],  # cipro, ceftriaxone, cefiderocol, linezolid, gepotidacin
                 [
@@ -401,7 +414,7 @@ with gr.Blocks() as demo:
                         "C[C@@]1([C@H]2C[C@H]3[C@@H](C(=O)C(=C([C@]3(C(=O)C2=C(C4=C1C=CC=C4O)O)O)O)C(=O)N)N(C)C)O",
                         "CC1=C2C=CC=C(C2=C(C3=C1C[C@H]4[C@@H](C(=O)C(=C([C@]4(C3=O)O)O)C(=O)N)N(C)C)O)O",
                     ]), 
-                    list(MODEL_REPOS)[0],
+                    "Staphylococcus aureus",
                     list(EXTRA_METRICS)[:2],
                 ],  # doxorubicin, ampicillin, amoxicillin, meropenem, tetracycline, anhydrotetracycline
                 [
@@ -410,10 +423,10 @@ with gr.Blocks() as demo:
                         "C1CN(CCC12C3=CC=CC=C3NC(=O)O2)CCC4=CC=C(C=C4)C(F)(F)F",
                         "COC1=CC(=CC(=C1OC)OC)CC2=CN=C(N=C2N)N",
                         "CC1=CC(=NO1)NS(=O)(=O)C2=CC=C(C=C2)N",
-                        "C1[C@@H]([C@H]([C@@H]([C@H]([C@@H]1NC(=O)[C@H](CCN)O)O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CO)O)N)O)O)O[C@@H]3[C@@H]([C@H]([C@@H]([C@H](O3)CN)O)O)O)N\nC1=CN=CC=C1C(=O)NN", 
-                        "C1=CN=CC=C1C(=O)NN  ",
+                        "C1[C@@H]([C@H]([C@@H]([C@H]([C@@H]1NC(=O)[C@H](CCN)O)O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CO)O)N)O)O)O[C@@H]3[C@@H]([C@H]([C@@H]([C@H](O3)CN)O)O)O)N", 
+                        "C1=CN=CC=C1C(=O)NN",
                     ]), 
-                    list(MODEL_REPOS)[0],
+                    ["Escherichia coli", "Acinetobacter baumannii"],
                     list(EXTRA_METRICS)[:2],
                 ],  # Halicin, Abaucin, Trimethoprim, Sulfamethoxazole, Amikacin, Isoniazid
                 [
@@ -425,7 +438,7 @@ with gr.Blocks() as demo:
                         "CC(C1CCC(C(O1)OC2C(CC(C(C2O)OC3C(C(C(CO3)(C)O)NC)O)N)N)N)NC",
                         "C[C@H]1/C=C/C=C(\C(=O)NC2=C(C(=C3C(=C2O)C(=C(C4=C3C(=O)[C@](O4)(O/C=C/[C@@H]([C@H]([C@H]([C@@H]([C@@H]([C@@H]([C@H]1O)C)O)C)OC(=O)C)C)OC)C)C)O)O)/C=N/N5CCN(CC5)C)/C",
                     ]), 
-                    list(MODEL_REPOS)[0],
+                    "Acinetobacter baumannii",
                     list(EXTRA_METRICS)[:2],
                 ],  # murepavadin, vancomycin, zosurabalpin, plazomicin, Gentamicin, rifampicin
                 [
@@ -437,7 +450,7 @@ with gr.Blocks() as demo:
                         "CCCCCCNC(=O)N1C=C(C(=O)NC1=O)F",
                         "C[C@@H]1OC[C@@H]2[C@@H](O1)[C@@H]([C@H]([C@@H](O2)O[C@H]3[C@H]4COC(=O)[C@@H]4[C@@H](C5=CC6=C(C=C35)OCO6)C7=CC(=C(C(=C7)OC)O)OC)O)O",
                     ]), 
-                    list(MODEL_REPOS)[0],
+                    "Escherichia coli",
                     list(EXTRA_METRICS)[:2],
                 ],  # Debio1452, Debio-1452-NH3, Fabimycin, 5-FU, Carmofur, Etoposide
                 [
@@ -449,7 +462,7 @@ with gr.Blocks() as demo:
                         "CN(CC1=CN=C2C(=N1)C(=NC(=N2)N)N)C3=CC=C(C=C3)C(=O)N[C@@H](CCC(=O)O)C(=O)O",
                         "CC1=NC2=C(C=C(C=C2)CN(C)C3=CC=C(S3)C(=O)N[C@@H](CCC(=O)O)C(=O)O)C(=O)N1",
                     ]), 
-                    list(MODEL_REPOS)[0],
+                    "Klebsiella pneumoniae",
                     list(EXTRA_METRICS)[:2],
                 ],  # Trimethoprim, SCH79797, Pemetrexed, Nolatrexed, Methotrexate, Raltitrexed
                 [
@@ -461,19 +474,19 @@ with gr.Blocks() as demo:
                         "CCC1=C(C(=NC(=N1)N)N)C2=CC=C(C=C2)Cl",
                         "C1=CC(=CC=C1C(=O)N[C@@H](CCC(=O)O)C(=O)O)NCC2=CN=C3C(=N2)C(=NC(=N3)N)N",
                     ]), 
-                    list(MODEL_REPOS)[0],
+                    "Klebsiella pneumoniae",
                     list(EXTRA_METRICS)[:2],
                 ],  # CHIR-090, SCH79797, DBeQ, Tenovin-6, Pyrimethamine, Aminopterin
 
             ],
             example_labels=[
-                "Ciprofloxacin, Ceftriaxone, Cefiderocol, Linezolid, Gepotidacin",
-                "Doxorubicin, Ampicillin, Amoxicillin, Meropenem, Tetracycline, Anhydrotetracycline",
-                "Halicin, Abaucin, Trimethoprim, Sulfamethoxazole, Amikacin, Isoniazid",
-                "Murepavadin, Vancomycin, Zosurabalpin, Plazomicin, Gentamicin, Rifampicin",
-                "Debio-1452, Debio-1452-NH3, Fabimycin, 5-FU, Carmofur, Etoposide",
-                "Trimethoprim, Pemetrexed,  Nolatrexed, Methotrexate, Raltitrexed",
-                "CHIR-090, SCH79797, DBeQ, Tenovin-6, Pyrimethamine, Aminopterin"
+                "_Y. pestis_ (plague) vs Ciprofloxacin, Ceftriaxone, Cefiderocol, Linezolid, Gepotidacin",
+                "_S. aureus_ vs Doxorubicin, Ampicillin, Amoxicillin, Meropenem, Tetracycline, Anhydrotetracycline",
+                "_E. coli_ and _A. baumannii_ vs Halicin, Abaucin, Trimethoprim, Sulfamethoxazole, Amikacin, Isoniazid",
+                "_A. baumannii_ vs Murepavadin, Vancomycin, Zosurabalpin, Plazomicin, Gentamicin, Rifampicin",
+                "_E. coli_ vs Debio-1452, Debio-1452-NH3, Fabimycin, 5-FU, Carmofur, Etoposide",
+                "_K. pneumoniae_ vs Trimethoprim, Pemetrexed,  Nolatrexed, Methotrexate, Raltitrexed",
+                "_K. pneumoniae_ vs CHIR-090, SCH79797, DBeQ, Tenovin-6, Pyrimethamine, Aminopterin"
             ],
             inputs=[input_line, output_species_single, extra_metric],
             cache_mode="eager",
@@ -517,7 +530,7 @@ with gr.Blocks() as demo:
             outputs=download_single
         )
 
-    with gr.Tab(f"Predict on structures from a file (max. {MAX_ROWS} rows, single species)"):
+    with gr.Tab(f"Predict on structures from a file (max. {MAX_ROWS} rows, ≤ 2 species)"):
         input_file = gr.File(
             label="Upload a table of chemical compounds here",
             file_types=[".xlsx", ".csv", ".tsv", ".txt"],
@@ -536,12 +549,20 @@ with gr.Blocks() as demo:
                 interactive=True,
                 visible=True,
             )
-        output_species = gr.Radio(
-            label="Species for prediction",
-            choices=list(MODEL_REPOS),
-            value=list(MODEL_REPOS)[0],
-            interactive=True,
-        )
+        output_species = [
+            gr.Dropdown(
+                label="Species 1 for prediction",
+                choices=list(MODEL_REPOS),
+                value=list(MODEL_REPOS)[0],
+                interactive=True,
+            ),
+            gr.Dropdown(
+                label="Species 2 for prediction",
+                choices=list(MODEL_REPOS),
+                value=None,
+                interactive=True,
+            ),
+        ]
         extra_metric_file = gr.CheckboxGroup(
             label="Extra metrics (Information Sensitivity can increase calculation time)",
             choices=list(EXTRA_METRICS),
@@ -578,7 +599,7 @@ with gr.Blocks() as demo:
                 interactive=True,
                 visible=False,
             )
-
+        with gr.Row():
             any_x_col = gr.Dropdown(
                 label="x-axis for right plot",
                 choices=[],
@@ -609,25 +630,25 @@ with gr.Blocks() as demo:
                 [
                     "example-data/stokes2020-eco.csv", 
                     "SMILES", 
-                    "Klebsiella pneumoniae",
-                    "Mean_Inhibition",
-                    "Klebsiella pneumoniae: Doubtscore",
+                    "Escherichia coli",
+                    "Mean_Growth",
+                    "Escherichia coli: Doubtscore",
                     list(EXTRA_METRICS)[:3],
                 ],
                 [
                     "example-data/liu23-abau.csv", 
                     "SMILES", 
-                    "Klebsiella pneumoniae",
+                    "Acinetobacter baumannii",
                     "Mean",
-                    "Klebsiella pneumoniae: Doubtscore",
+                    "Acinetobacter baumannii: Doubtscore",
                     list(EXTRA_METRICS)[:3],
                 ],
                 [
                     "example-data/wong24-sau-tox-5000.csv", 
                     "SMILES", 
-                    "Klebsiella pneumoniae",
+                    "Staphylococcus aureus",
                     "Mean",
-                    "Klebsiella pneumoniae: Doubtscore",
+                    "Staphylococcus aureus: Doubtscore",
                     list(EXTRA_METRICS)[:3],
                 ],
             ],
@@ -636,7 +657,7 @@ with gr.Blocks() as demo:
                 "A. baumannii training data from Liu, 2023",
                 "S. aureus and toxicity training data from Wong, 2024",
             ],
-            inputs=[input_file, input_column, output_species, observed_col, color_col, extra_metric_file],
+            inputs=[input_file, input_column, output_species[0], observed_col, color_col, extra_metric_file],
             cache_mode="eager",
         )
         with gr.Row():
@@ -671,7 +692,7 @@ with gr.Blocks() as demo:
                 input_data, 
                 input_column,
                 input_format,
-                output_species,
+                *output_species,
                 extra_metric_file,
             ],
             outputs={
@@ -697,7 +718,7 @@ with gr.Blocks() as demo:
             plot_pred_vs_observed,
             inputs=[
                 input_data,
-                output_species,
+                output_species[0],
                 observed_col,
                 color_col,
             ],

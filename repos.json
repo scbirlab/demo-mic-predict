@@ -1,0 +1,12 @@
+{
+    "Acinetobacter baumannii": "hf://scbirlab/spark-dv-2503-abau",
+    "Brucella abortus": "hf://scbirlab/spark-dv-2503-babo",
+    "Escherichia coli": "hf://scbirlab/spark-dv-2503-ecol",
+    "Francisella tularensis": "hf://scbirlab/spark-dv-2503-ftul",
+    "Klebsiella pneumoniae": "hf://scbirlab/spark-dv-2503-kpne",
+    "Pseudomonas aeruginosa": "hf://scbirlab/spark-dv-2503-paer",
+    "Staphylococcus aureus": "hf://scbirlab/spark-dv-2503-saur",
+    "Streptococcus pneumoniae": "hf://scbirlab/spark-dv-2503-spne",
+    "Yersinia enterocolitica": "hf://scbirlab/spark-dv-2503-yent",
+    "Yersinia pestis": "hf://scbirlab/spark-dv-2503-ypes"
+}
