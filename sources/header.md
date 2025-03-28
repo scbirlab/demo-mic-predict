@@ -23,5 +23,3 @@ Available species for prediction are:
 - [_Yersinia pestis_](https://huggingface.co/scbirlab/spark-dv-2503-ypes)
 
 Click on the links above for training details, model configurations, and evaluation metrics.
-
-More to come in the next week!
