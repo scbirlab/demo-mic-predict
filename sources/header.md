@@ -11,6 +11,17 @@ hyperparameter searches and selecting the model that performs best on unseen tes
 Duvida also allows the calculation of uncertainty metrics based on training data.
 
 Available species for prediction are:
-- [_Klebsiella pneumoniae_](https://huggingface.co/scbirlab/spark-dv-fp-2503-kpn)
+- [_Acinetobacter baumannii_](https://huggingface.co/scbirlab/spark-dv-2503-abau)
+- [_Brucella abortus_](https://huggingface.co/scbirlab/spark-dv-2503-babo)
+- [_Escherichia coli_](https://huggingface.co/scbirlab/spark-dv-2503-ecol)
+- [_Francisella tularensis_](https://huggingface.co/scbirlab/spark-dv-2503-ftul)
+- [_Klebsiella pneumoniae_](https://huggingface.co/scbirlab/spark-dv-2503-kpne)
+- [_Pseudomonas aeruginosa_](https://huggingface.co/scbirlab/spark-dv-2503-paer)
+- [_Staphylococcus aureus_](https://huggingface.co/scbirlab/spark-dv-2503-saur)
+- [_Streptococcus pneumoniae_](https://huggingface.co/scbirlab/spark-dv-2503-spne)
+- [_Yersinia enterocolitica_](https://huggingface.co/scbirlab/spark-dv-2503-yent)
+- [_Yersinia pestis_](https://huggingface.co/scbirlab/spark-dv-2503-ypes)
+
+Click on the links above for training details, model configurations, and evaluation metrics.
 
 More to come in the next week!
