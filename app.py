@@ -348,7 +348,12 @@ def draw_one(
         mols,
         molsPerRow=min(3, len(mols)), 
         subImgSize=(450, 450),
-        legends=["\n".join(items) for items in zip(*_ids.values())],
+        legends=[
+            "\n".join(
+                _x if _x is not None else "" 
+                for _x in items
+            ) for items in zip(*_ids.values())
+        ],
     )
 
 
