@@ -316,7 +316,7 @@ def predict_file(
         + ['smiles', "mwt", "clogp"]
     ]
     plot_dropdown = get_dropdown_options(prediction_df, _type="number")
-
+    plot_dropdown = (plot_dropdown,) * 5
     gradio_opts = {
         "label": "Predictions",
         "value": prediction_df,
@@ -327,9 +327,9 @@ def predict_file(
     }
 
     if return_pd:
-        return ((prediction_df, gr.Dataframe(**gradio_opts),),) + (plot_dropdown,) * 5
+        return ((prediction_df, gr.Dataframe(**gradio_opts)),) + (plot_dropdown,)
     else:
-        return (gr.Dataframe(**gradio_opts),) + (plot_dropdown,) * 5
+        return (gr.Dataframe(**gradio_opts),) + (plot_dropdown,)
 
 
 def draw_one(
