@@ -28,7 +28,7 @@ from schemist.tables import converter
 import torch
 from duvida.stateless.config import config
 
-THEME = 'd8ahazard/material_design_rd'
+THEME = gr.themes.Soft()
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 CACHE = "./cache"
