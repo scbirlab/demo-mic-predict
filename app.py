@@ -197,8 +197,7 @@ def predict_one(
     input_representation: str = 'smiles', 
     predict: Union[Iterable[str], str] = 'smiles', 
     extra_metrics: Optional[Union[Iterable[str], str]] = None,
-    return_pd: bool = False,
-    progress = gr.Progress(track_tqdm=True)
+    return_pd: bool = False
 ):
     prediction_df = convert_one(
         strings=strings,
@@ -269,8 +268,7 @@ def predict_file(
     predict: str = 'smiles', 
     predict2: Optional[str] = None, 
     extra_metrics: Optional[Union[Iterable[str], str]] = None,
-    return_pd: bool = False,
-    progress = gr.Progress(track_tqdm=True)
+    return_pd: bool = False
 ):
     predict = cast(predict, to=list)
     if predict2 is not None and predict2 in MODELBOXES:
@@ -431,7 +429,8 @@ def _predict_then_draw_then_download(
     predict: Union[Iterable[str], str] = 'smiles', 
     extra_metrics: Optional[Union[Iterable[str], str]] = None,
     smiles_col: str = "smiles",
-    legends: Optional[Union[str, Iterable[str]]] = None
+    legends: Optional[Union[str, Iterable[str]]] = None,
+    progress = gr.Progress(track_tqdm=True)
 ):
     df, gr_df = predict_one(
         strings=strings,
@@ -453,7 +452,8 @@ def _load_then_predict_then_download_then_reveal_plot(
     input_representation: str = 'smiles',
     predict: str = 'smiles', 
     predict2: Optional[str] = "", 
-    extra_metrics: Optional[Union[Iterable[str], str]] = None
+    extra_metrics: Optional[Union[Iterable[str], str]] = None,
+    progress = gr.Progress(track_tqdm=True)
 ):
     (df, df_gr), col_opts = load_input_data(
         file, 
