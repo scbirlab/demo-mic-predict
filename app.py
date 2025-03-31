@@ -163,10 +163,10 @@ def _prediction_loop(
             cache=CACHE,
         ).with_format("numpy")["__prediction__"].flatten()
         print(prediction)
-        this_col = f"{species}:\npredicted MIC (µM)"
+        this_col = f"{species}: predicted MIC (µM)"
         df[this_col] = np.power(10., -prediction) * 1e6
         prediction_cols.append(this_col)
-        this_col = f"{species}:\npredicted MIC (µg / mL)"
+        this_col = f"{species}: predicted MIC (µg / mL)"
         df[this_col] = np.power(10., -prediction) * 1e3 * df["mwt"]
         prediction_cols.append(this_col)
 
@@ -175,7 +175,7 @@ def _prediction_loop(
             print_err(message)
             gr.Info(message, duration=10)
             # this_modelbox._input_training_data = this_modelbox._input_training_data.remove_columns([this_modelbox._in_key])
-            this_col = f"{species}:\n{extra_metric}"
+            this_col = f"{species}: {extra_metric}"
             prediction_cols.append(this_col)
             print(">>>", this_modelbox._input_training_data)
             print(">>>", this_modelbox._input_training_data.format)
@@ -221,7 +221,7 @@ def predict_one(
         "pinned_columns": 3,
         "visible": True,
         "wrap": True,
-        "column_widths": [200] * df.shape[1],
+        "column_widths": [120] * 3 + [250] * (prediction_df.shape[1] - 3),
     }
     if return_pd:
         return df, gr.DataFrame(**gradio_opts)
@@ -320,7 +320,7 @@ def predict_file(
         "pinned_columns": 3,
         "visible": True,
         "wrap": True,
-        "column_widths": [200] * prediction_df.shape[1],
+        "column_widths": [120] * 3 + [250] * (prediction_df.shape[1] - 3),
     }
 
     if return_pd:
@@ -497,7 +497,7 @@ def _initial_setup():
             interactive=True,
         ),
         "extras": gr.CheckboxGroup(
-            label="Extra metrics (Doubscore & Information Sensitivity can increase calculation time to a couple of minutes!)",
+            label="Extra metrics (Doubtscore & Information Sensitivity can increase calculation time to a couple of minutes!)",
             choices=list(EXTRA_METRICS),
             value=list(EXTRA_METRICS)[:2],
             interactive=True,
@@ -513,7 +513,6 @@ def _initial_setup():
     output_line = gr.DataFrame(
         label="Predictions (scroll left and right)",
         interactive=False,
-        pinned_columns=3,
         visible=True,
     )
     download_single = gr.DownloadButton(
