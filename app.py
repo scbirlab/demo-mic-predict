@@ -816,22 +816,24 @@ if __name__ == "__main__":
                 js=True,
             )
 
-            # file_examples.load_input_event.then(
-            #     lambda: gr.Button(visible=True),
-            #     outputs=[plot_button],
-            #     js=True,
-            # )
-            
-            for dropdown in itertools.chain(
+            file_examples.load_input_event.then(
+                lambda: gr.Button(visible=True),
+                outputs=[plot_button],
+                js=True,
+            )
+
+            plot_dropdowns = list(itertools.chain(
                 left_plot_inputs.values(),
                 right_plot_inputs.values(), 
-            ):
-                # for e in (file_examples.load_input_event, go2_click_event):
-                df_change.then(
-                    partial(get_dropdown_options, _type="number"),
-                    inputs=[input_dataframe],
-                    outputs=[dropdown],
-                )
+            ))
+            
+            for dropdown in plot_dropdowns:
+                for e in (file_examples.load_input_event, go2_click_event):
+                    df_change.then(
+                        partial(get_dropdown_options, _type="number"),
+                        inputs=[input_dataframe],
+                        outputs=[dropdown],
+                    )
 
             plot_button.click(
                 plot_pred_vs_observed,
