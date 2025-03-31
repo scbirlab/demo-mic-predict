@@ -429,8 +429,7 @@ def _predict_then_draw_then_download(
     predict: Union[Iterable[str], str] = 'smiles', 
     extra_metrics: Optional[Union[Iterable[str], str]] = None,
     smiles_col: str = "smiles",
-    legends: Optional[Union[str, Iterable[str]]] = None,
-    progress = gr.Progress(track_tqdm=True)
+    legends: Optional[Union[str, Iterable[str]]] = None
 ):
     df, gr_df = predict_one(
         strings=strings,
@@ -452,8 +451,7 @@ def _load_then_predict_then_download_then_reveal_plot(
     input_representation: str = 'smiles',
     predict: str = 'smiles', 
     predict2: Optional[str] = "", 
-    extra_metrics: Optional[Union[Iterable[str], str]] = None,
-    progress = gr.Progress(track_tqdm=True)
+    extra_metrics: Optional[Union[Iterable[str], str]] = None
 ):
     (df, df_gr), col_opts = load_input_data(
         file, 
