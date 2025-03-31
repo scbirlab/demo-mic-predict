@@ -517,7 +517,7 @@ def _initial_setup():
     )
     download_single = gr.DownloadButton(
         label="Download predictions",
-        visible=False,
+        visible=True,
     )
     drawing = gr.Image(label="Chemical structures")
 
@@ -790,24 +790,19 @@ if __name__ == "__main__":
                 ],
             )
             go2_click_event = go_button2.click(
-                predict_file,
+                _load_then_predict_then_download_then_reveal_plot,
                 inputs=[
-                    input_dataframe, 
-                    file_inputs["column"],
-                    file_inputs["format"],
+                    file_inputs["file"],
+                    file_inputs["column"], 
+                    file_inputs["format"], 
                     *file_inputs["species"],
                     file_inputs["extras"],
                 ],
                 outputs=[
                     input_dataframe,
+                    download,
                     *plot_dropdowns,
                 ],
-            )
-            
-            df_change = input_dataframe.change(
-                download_table,
-                inputs=input_dataframe,
-                outputs=download
             ).then(
                 lambda: gr.Button(visible=True),
                 outputs=[plot_button],
@@ -819,14 +814,6 @@ if __name__ == "__main__":
                 outputs=[plot_button],
                 js=True,
             )
-            
-            for dropdown in plot_dropdowns:
-                for e in (file_examples.load_input_event, go2_click_event):
-                    df_change.then(
-                        partial(get_dropdown_options, _type="number"),
-                        inputs=[input_dataframe],
-                        outputs=[dropdown],
-                    )
 
             plot_button.click(
                 plot_pred_vs_observed,
