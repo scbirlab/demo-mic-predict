@@ -315,28 +315,21 @@ def predict_file(
         + prediction_cols + other_cols 
         + ['smiles', "mwt", "clogp"]
     ]
+    plot_dropdown = get_dropdown_options(prediction_df, _type="number")
+
+    gradio_opts = {
+        "label": "Predictions",
+        "value": prediction_df,
+        "pinned_columns": 3,
+        "visible": True,
+        "wrap": True,
+        "column_widths": [125] * prediction_df.shape[1],
+    }
 
     if return_pd:
-        return (
-            prediction_df, 
-            gr.Dataframe(
-                label="Predictions",
-                value=prediction_df,
-                pinned_columns=3,
-                visible=True,
-                wrap=True,
-                column_widths=[75] * prediction_df.shape[1],
-            ),
-        )
+        return ((prediction_df, gr.Dataframe(**gradio_opts),),) + (plot_dropdown,) * 5
     else:
-        return gr.Dataframe(
-            label="Predictions",
-            value=prediction_df,
-            pinned_columns=3,
-            visible=True,
-            wrap=True,
-            column_widths=[125] * prediction_df.shape[1],
-        )
+        return (gr.Dataframe(**gradio_opts),) + (plot_dropdown,) * 5
 
 
 def draw_one(
@@ -464,7 +457,7 @@ def _load_then_predict_then_download_then_reveal_plot(
         file, 
         return_pd=True,
     )
-    df, df_gr = predict_file(
+    (df, df_gr), plot_opts = predict_file(
         df,
         column=column,
         input_representation=input_representation,
@@ -474,11 +467,10 @@ def _load_then_predict_then_download_then_reveal_plot(
         return_pd=True,
     )
     print_err(df.head())
-    plot_dropdown = get_dropdown_options(df, _type="number")
     return (
         df_gr, 
         download_table(df),
-    ) + (plot_dropdown, ) * 5
+    ) + plot_opts
 
 
 def _initial_setup():
@@ -808,6 +800,7 @@ if __name__ == "__main__":
                 ],
                 outputs=[
                     input_dataframe,
+                    *plot_dropdowns,
                 ],
             )
             
