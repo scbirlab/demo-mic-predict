@@ -197,8 +197,8 @@ def predict_one(
     input_representation: str = 'smiles', 
     predict: Union[Iterable[str], str] = 'smiles', 
     extra_metrics: Optional[Union[Iterable[str], str]] = None,
-    return_pd: bool = False
-    # progress = gr.Progress(track_tqdm=True)
+    return_pd: bool = False,
+    progress = gr.Progress(track_tqdm=True)
 ):
     prediction_df = convert_one(
         strings=strings,
@@ -269,8 +269,8 @@ def predict_file(
     predict: str = 'smiles', 
     predict2: Optional[str] = None, 
     extra_metrics: Optional[Union[Iterable[str], str]] = None,
-    return_pd: bool = False
-    # progress = gr.Progress(track_tqdm=True)
+    return_pd: bool = False,
+    progress = gr.Progress(track_tqdm=True)
 ):
     predict = cast(predict, to=list)
     if predict2 is not None and predict2 in MODELBOXES:
@@ -698,7 +698,7 @@ if __name__ == "__main__":
                     download_single,
                 ],
                 cache_examples=True,
-                cache_mode="lazy",
+                cache_mode="eager",
             )
 
             for val in line_inputs.values():
@@ -754,7 +754,7 @@ if __name__ == "__main__":
                     *plot_dropdowns,
                 ],
                 cache_examples=True,  ## appears to cause CSV load error
-                cache_mode="lazy",
+                cache_mode="eager",
             )
             file_inputs["file"].render()
             with gr.Row():
