@@ -215,21 +215,18 @@ def predict_one(
         + prediction_cols 
         + ['smiles', 'inchikey', "mwt", "clogp"]
     ]
+    gradio_opts = {
+        "label": "Predictions",
+        "value": df,
+        "pinned_columns": 3,
+        "visible": True,
+        "wrap": True,
+        "column_widths": [200] * df.shape[1],
+    }
     if return_pd:
-        return (
-            df,
-            gr.DataFrame(
-                df,
-                pinned_columns=3,
-                visible=True,
-            )
-        )
+        return df, gr.DataFrame(**gradio_opts)
     else:
-        return gr.DataFrame(
-            df,
-            pinned_columns=3,
-            visible=True,
-        )
+        return gr.DataFrame(**gradio_opts)
 
 def convert_file(
     df: pd.DataFrame, 
@@ -323,7 +320,7 @@ def predict_file(
         "pinned_columns": 3,
         "visible": True,
         "wrap": True,
-        "column_widths": [125] * prediction_df.shape[1],
+        "column_widths": [200] * prediction_df.shape[1],
     }
 
     if return_pd:
@@ -803,6 +800,7 @@ if __name__ == "__main__":
                     download,
                     *plot_dropdowns,
                 ],
+                scroll_to_output=True,
             ).then(
                 lambda: gr.Button(visible=True),
                 outputs=[plot_button],
@@ -824,6 +822,7 @@ if __name__ == "__main__":
                     left_plot_inputs["color"],
                 ],
                 outputs=[plots["left"]],
+                scroll_to_output=True,
             ).then(
                 plot_x_vs_y,
                 inputs=[
