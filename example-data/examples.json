@@ -1,0 +1,122 @@
+{
+    "line input examples": [
+        {
+            "label": "Y. pestis (plague) vs Ciprofloxacin, Ceftriaxone, Cefiderocol, Linezolid, Gepotidacin",
+            "strings": [
+                "Ciprofloxacin: C1CC1N2C=C(C(=O)C3=CC(=C(C=C32)N4CCNCC4)F)C(=O)O",
+                "Ceftriaxone: CN1C(=NC(=O)C(=O)N1)SCC2=C(N3[C@@H]([C@@H](C3=O)NC(=O)/C(=N\\OC)/C4=CSC(=N4)N)SC2)C(=O)O",
+                "Cefiderocol: CC(C)(C(=O)O)O/N=C(/C1=CSC(=N1)N)\\C(=O)N[C@H]2[C@@H]3N(C2=O)C(=C(CS3)C[N+]4(CCCC4)CCNC(=O)C5=C(C(=C(C=C5)O)O)Cl)C(=O)[O-]",
+                "Linezolid: CC(=O)NC[C@H]1CN(C(=O)O1)C2=CC(=C(C=C2)N3CCOCC3)F",
+                "Gepotidacin: C1CC2=CC(=NC=C2OC1)CNC3CCN(CC3)C[C@@H]4CN5C(=O)C=CC6=C5N4C(=O)C=N6"
+            ],
+            "species": [
+                "Yersinia pestis"
+            ]
+        },
+        {
+            "label": "S. aureus vs Doxorubicin, Ampicillin, Amoxicillin, Meropenem, Tetracycline, Anhydrotetracycline",
+            "strings": [
+                "Doxorubicin: C[C@H]1[C@H]([C@H](C[C@@H](O1)O[C@H]2C[C@@](CC3=C2C(=C4C(=C3O)C(=O)C5=C(C4=O)C(=CC=C5)OC)O)(C(=O)CO)O)N)O",
+                "Ampicillin: CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)[C@@H](C3=CC=CC=C3)N)C(=O)O)C",
+                "Amoxicillin: CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)[C@@H](C3=CC=C(C=C3)O)N)C(=O)O)C", 
+                "Meropenem: C[C@@H]1[C@@H]2[C@H](C(=O)N2C(=C1S[C@H]3C[C@H](NC3)C(=O)N(C)C)C(=O)O)[C@@H](C)O",
+                "Tetracycline: C[C@@]1([C@H]2C[C@H]3[C@@H](C(=O)C(=C([C@]3(C(=O)C2=C(C4=C1C=CC=C4O)O)O)O)C(=O)N)N(C)C)O",
+                "Anhydrotetracycline: CC1=C2C=CC=C(C2=C(C3=C1C[C@H]4[C@@H](C(=O)C(=C([C@]4(C3=O)O)O)C(=O)N)N(C)C)O)O"
+            ],
+            "species": [
+                "Staphylococcus aureus"
+            ]
+        },
+        {
+            "label": "E. coli and A. baumannii vs Halicin, Abaucin, Trimethoprim, Sulfamethoxazole, Amikacin, Isoniazid",
+            "strings": [
+                "Halicin: C1=C(SC(=N1)SC2=NN=C(S2)N)[N+](=O)[O-]",
+                "Abaucin: C1CN(CCC12C3=CC=CC=C3NC(=O)O2)CCC4=CC=C(C=C4)C(F)(F)F",
+                "Trimethoprim: COC1=CC(=CC(=C1OC)OC)CC2=CN=C(N=C2N)N",
+                "Amikacin: CC1=CC(=NO1)NS(=O)(=O)C2=CC=C(C=C2)N",
+                "Sulfamethoxazole: C1[C@@H]([C@H]([C@@H]([C@H]([C@@H]1NC(=O)[C@H](CCN)O)O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CO)O)N)O)O)O[C@@H]3[C@@H]([C@H]([C@@H]([C@H](O3)CN)O)O)O)N", 
+                "Isoniazid: C1=CN=CC=C1C(=O)NN"
+            ],
+            "species": [
+                "Escherichia coli", 
+                "Acinetobacter baumannii"
+            ]
+        },
+        {
+            "label": "A. baumannii vs Murepavadin, Vancomycin, Zosurabalpin, Plazomicin, Gentamicin, Rifampicin",
+            "strings": [
+                "Murepavadin: CC[C@H](C)[C@H]1C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N2CCC[C@@H]2C(=O)N3CCC[C@H]3C(=O)N[C@H](C(=O)N[C@H](C(=O)N1)CC4=CNC5=CC=CC=C54)[C@@H](C)O)CO)C)CCN)CCN)CC6=CNC7=CC=CC=C76)CCN)CCN)CCCN)CCN",
+                "Vancomycin: C[C@H]1[C@H]([C@@](C[C@@H](O1)O[C@@H]2[C@H]([C@@H]([C@H](O[C@H]2OC3=C4C=C5C=C3OC6=C(C=C(C=C6)[C@H]([C@H](C(=O)N[C@H](C(=O)N[C@H]5C(=O)N[C@@H]7C8=CC(=C(C=C8)O)C9=C(C=C(C=C9O)O)[C@H](NC(=O)[C@H]([C@@H](C1=CC(=C(O4)C=C1)Cl)O)NC7=O)C(=O)O)CC(=O)N)NC(=O)[C@@H](CC(C)C)NC)O)Cl)CO)O)O)(C)N)O",
+                "Zosurabalpin: CN1[C@H](C(=O)NCC2=C(C=CC=C2SC3=C(CN[C@H](C(=O)N[C@H](C1=O)CCCCN)CCCN)C=CC=N3)C4=CC=C(C=C4)C(=O)O)CC5=CNC6=CC=CC=C65", 
+                "Plazomicin: C[C@@]1(CO[C@@H]([C@@H]([C@H]1NC)O)O[C@H]2[C@@H](C[C@@H]([C@H]([C@@H]2O)O[C@@H]3[C@@H](CC=C(O3)CNCCO)N)N)NC(=O)[C@H](CCN)O)O",
+                "Gentamicin: CC(C1CCC(C(O1)OC2C(CC(C(C2O)OC3C(C(C(CO3)(C)O)NC)O)N)N)N)NC",
+                "Rifampicin: C[C@H]1/C=C/C=C(\\C(=O)NC2=C(C(=C3C(=C2O)C(=C(C4=C3C(=O)[C@](O4)(O/C=C/[C@@H]([C@H]([C@H]([C@@H]([C@@H]([C@@H]([C@H]1O)C)O)C)OC(=O)C)C)OC)C)C)O)O)/C=N/N5CCN(CC5)C)/C"
+            ],
+            "species": [
+                "Acinetobacter baumannii"
+            ]
+        },
+        {
+            "label": "E. coli vs Debio-1452, Debio-1452-NH3, Fabimycin, 5-FU, Carmofur, Etoposide",
+            "strings": [
+                "Debio-1452: CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)CC4)N=C3",
+                "Debio-1452-NH3: CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)[C@@H](C4)N)N=C3",
+                "Fabimycin: CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)[C@H](CC4)[NH3+])N=C3.[Cl-]",
+                "5-FU: C1=C(C(=O)NC(=O)N1)F",
+                "Carmofur: CCCCCCNC(=O)N1C=C(C(=O)NC1=O)F",
+                "Etoposide: C[C@@H]1OC[C@@H]2[C@@H](O1)[C@@H]([C@H]([C@@H](O2)O[C@H]3[C@H]4COC(=O)[C@@H]4[C@@H](C5=CC6=C(C=C35)OCO6)C7=CC(=C(C(=C7)OC)O)OC)O)O"
+            ],
+            "species": [
+                "Escherichia coli"
+            ]
+        },
+        {
+            "label": "K. pneumoniae vs Trimethoprim, SCH-79797, Pemetrexed, Nolatrexed, Methotrexate, Raltitrexed",
+            "strings": [
+                "Trimethoprim: COC1=CC(=CC(=C1OC)OC)CC2=CN=C(N=C2N)N",
+                "SCH-79797: CC(C)C1=CC=C(C=C1)CN2C=CC3=C2C=CC4=C3C(=NC(=N4)NC5CC5)N",
+                "Pemetrexed: C1=CC(=CC=C1CCC2=CNC3=C2C(=O)NC(=N3)N)C(=O)N[C@@H](CCC(=O)O)C(=O)O",
+                "Nolatrexed: CC1=C(C2=C(C=C1)N=C(NC2=O)N)SC3=CC=NC=C3",
+                "Methotrexate: CN(CC1=CN=C2C(=N1)C(=NC(=N2)N)N)C3=CC=C(C=C3)C(=O)N[C@@H](CCC(=O)O)C(=O)O",
+                "Raltitrexed: CC1=NC2=C(C=C(C=C2)CN(C)C3=CC=C(S3)C(=O)N[C@@H](CCC(=O)O)C(=O)O)C(=O)N1"
+            ],
+            "species": [
+                "Klebsiella pneumoniae"
+            ]
+        },
+        {
+            "label": "K. pneumoniae vs CHIR-090, SCH79797, DBeQ, Tenovin-6, Pyrimethamine, Aminopterin",
+            "strings": [
+                "CHIR-090: C[C@H]([C@@H](C(=O)NO)NC(=O)C1=CC=C(C=C1)C#CC2=CC=C(C=C2)CN3CCOCC3)O",
+                "SCH79797: CC(C)C1=CC=C(C=C1)CN2C=CC3=C2C=CC4=C3C(=NC(=N4)NC5CC5)N",
+                "DBeQ: C1=CC=C(C=C1)CNC2=NC(=NC3=CC=CC=C32)NCC4=CC=CC=C4",
+                "Tenovin-6: CC(C)(C)C1=CC=C(C=C1)C(=O)NC(=S)NC2=CC=C(C=C2)NC(=O)CCCCN(C)C",
+                "Pyrimethamine: CCC1=C(C(=NC(=N1)N)N)C2=CC=C(C=C2)Cl",
+                "Aminopterin: C1=CC(=CC=C1C(=O)N[C@@H](CCC(=O)O)C(=O)O)NCC2=CN=C3C(=N2)C(=NC(=N3)N)N"
+            ],
+            "species": [
+                "Klebsiella pneumoniae"
+            ]
+        }
+    ],
+    "file examples": [
+        {
+            "label": "E. coli training data from Stokes J. et al., Cell (2020)",
+            "file": "example-data/stokes2020-eco.csv", 
+            "column": "SMILES", 
+            "species": "Escherichia coli"
+        },
+        {
+            "label": "A. baumannii training data from Liu (2023)",
+            "file": "example-data/liu23-abau.csv", 
+            "column": "SMILES", 
+            "species": "Acinetobacter baumannii"
+        },
+        {
+            "label": "S. aureus training data from Wong (2024)",
+            "file": "example-data/wong24-sau-tox-5000.csv", 
+            "column": "SMILES", 
+            "species": "Staphylococcus aureus"
+        }
+    ]
+}
