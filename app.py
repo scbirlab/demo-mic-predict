@@ -28,7 +28,7 @@ from schemist.tables import converter
 import torch
 from duvida.stateless.config import config
 
-THEME = gr.themes.Soft()
+THEME = gr.themes.Default()
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 CACHE = "./cache"
@@ -474,11 +474,11 @@ def _load_then_predict_then_download_then_reveal_plot(
         return_pd=True,
     )
     print_err(df.head())
-    # plot_dropdown = get_dropdown_options(df, _type="number")
+    plot_dropdown = get_dropdown_options(df, _type="number")
     return (
         df_gr, 
         download_table(df),
-    )
+    ) + (plot_dropdown, ) * 5
 
 
 def _initial_setup():
@@ -730,6 +730,10 @@ if __name__ == "__main__":
                 ],
             )
         with gr.Tab(f"Predict on structures from a file (max. {MAX_ROWS} rows, ≤ 2 species)"):
+            plot_dropdowns = list(itertools.chain(
+                left_plot_inputs.values(),
+                right_plot_inputs.values(), 
+            ))
             file_examples = gr.Examples(
                 examples=[
                     [
@@ -755,6 +759,7 @@ if __name__ == "__main__":
                 outputs=[
                     input_dataframe,
                     download,
+                    *plot_dropdowns,
                 ],
                 cache_examples=True,  ## appears to cause CSV load error
                 cache_mode="lazy",
@@ -821,11 +826,6 @@ if __name__ == "__main__":
                 outputs=[plot_button],
                 js=True,
             )
-
-            plot_dropdowns = list(itertools.chain(
-                left_plot_inputs.values(),
-                right_plot_inputs.values(), 
-            ))
             
             for dropdown in plot_dropdowns:
                 for e in (file_examples.load_input_event, go2_click_event):
