@@ -344,8 +344,8 @@ def draw_one(
         mols = [mols]
     return Draw.MolsToGridImage(
         mols,
-        molsPerRow=min(3, len(mols)), 
-        subImgSize=(450, 450),
+        molsPerRow=min(5, len(mols)), 
+        subImgSize=(600, 600),
         legends=[
             "\n".join(
                 _x if _x is not None else "" 
