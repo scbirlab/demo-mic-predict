@@ -115,7 +115,7 @@ def convert_one(
     output_representation = cast(output_representation, to=list)
     for rep in output_representation:
         message = f"Converting from {input_representation} to {rep}..."
-        gr.Info(message, duration=10)
+        gr.Info(message, duration=3)
 
     df = pd.DataFrame({
         input_representation: _clean_split_input(strings),
@@ -337,7 +337,7 @@ def draw_one(
     else:
         legends = []
     message = f"Drawing {df.shape[0]} molecules..."
-    gr.Info(message, duration=10)
+    gr.Info(message, duration=2)
     _ids = {col: df[col].tolist() for col in legends}
     mols = cast(_x2mol(df[smiles_col], "smiles"), to=list)
     if isinstance(mols, Mol):
