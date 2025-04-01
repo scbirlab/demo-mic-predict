@@ -32,8 +32,8 @@ THEME = gr.themes.Default()
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 CACHE = "./cache"
-MAX_ROWS = 500
-BATCH_SIZE = 32
+MAX_ROWS = 1000
+BATCH_SIZE = 16
 HEADER_FILE = os.path.join("sources", "header.md")
 with open("repos.json", "r") as f:
     MODEL_REPOS = json.load(f)
@@ -676,7 +676,7 @@ if __name__ == "__main__":
                         "\n".join(eg["strings"]), 
                         "smiles", 
                         eg["species"], 
-                        list(EXTRA_METRICS)[:2],
+                        list(EXTRA_METRICS)[:3],
                     ] 
                     for eg in EXAMPLES["line input examples"]
                 ],
@@ -732,7 +732,7 @@ if __name__ == "__main__":
                         "smiles",
                         eg["species"],
                         "",
-                        list(EXTRA_METRICS)[:2],
+                        list(EXTRA_METRICS)[:3],
                     ] for eg in EXAMPLES["file examples"]
                 ],
                 example_labels=[
