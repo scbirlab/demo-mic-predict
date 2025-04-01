@@ -12,12 +12,13 @@
             ]
         },
         {
-            "label": "E. coli, K. pneumoniae, & S. aureus vs Ampicillin, Linezolid, Amoxicillin, Meropenem",
+            "label": "E. coli, K. pneumoniae, & S. aureus vs Ampicillin, Linezolid, Amoxicillin, Meropenem, Avibactam",
             "strings": [
                 "Ampicillin: CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)[C@@H](C3=CC=CC=C3)N)C(=O)O)C",
                 "Linezolid: CC(=O)NC[C@H]1CN(C(=O)O1)C2=CC(=C(C=C2)N3CCOCC3)F",
                 "Amoxicillin: CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)[C@@H](C3=CC=C(C=C3)O)N)C(=O)O)C", 
-                "Meropenem: C[C@@H]1[C@@H]2[C@H](C(=O)N2C(=C1S[C@H]3C[C@H](NC3)C(=O)N(C)C)C(=O)O)[C@@H](C)O"
+                "Meropenem: C[C@@H]1[C@@H]2[C@H](C(=O)N2C(=C1S[C@H]3C[C@H](NC3)C(=O)N(C)C)C(=O)O)[C@@H](C)O",
+                "Avibactam: C1C[C@H](N2C[C@@H]1N(C2=O)OS(=O)(=O)O)C(=O)N"
             ],
             "species": [
                 "Escherichia coli", 
@@ -26,12 +27,13 @@
             ]
         },
         {
-            "label": "E. coli, P. aeruginosa, & S. aureus vs Gepotidacin, Murepavadin, Zosurabalpin, Plazomicin",
+            "label": "E. coli, P. aeruginosa, & S. aureus vs Gepotidacin, Murepavadin, Zosurabalpin, Plazomicin, Iboxamycin",
             "strings": [
                 "Murepavadin: CC[C@H](C)[C@H]1C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N2CCC[C@@H]2C(=O)N3CCC[C@H]3C(=O)N[C@H](C(=O)N[C@H](C(=O)N1)CC4=CNC5=CC=CC=C54)[C@@H](C)O)CO)C)CCN)CCN)CC6=CNC7=CC=CC=C76)CCN)CCN)CCCN)CCN",
                 "Gepotidacin: C1CC2=CC(=NC=C2OC1)CNC3CCN(CC3)C[C@@H]4CN5C(=O)C=CC6=C5N4C(=O)C=N6",
                 "Zosurabalpin: CN1[C@H](C(=O)NCC2=C(C=CC=C2SC3=C(CN[C@H](C(=O)N[C@H](C1=O)CCCCN)CCCN)C=CC=N3)C4=CC=C(C=C4)C(=O)O)CC5=CNC6=CC=CC=C65", 
-                "Plazomicin: C[C@@]1(CO[C@@H]([C@@H]([C@H]1NC)O)O[C@H]2[C@@H](C[C@@H]([C@H]([C@@H]2O)O[C@@H]3[C@@H](CC=C(O3)CNCCO)N)N)NC(=O)[C@H](CCN)O)O"
+                "Plazomicin: C[C@@]1(CO[C@@H]([C@@H]([C@H]1NC)O)O[C@H]2[C@@H](C[C@@H]([C@H]([C@@H]2O)O[C@@H]3[C@@H](CC=C(O3)CNCCO)N)N)NC(=O)[C@H](CCN)O)O",
+                "Iboxamycin: C[C@@H]([C@H]([C@@H]1[C@@H]([C@@H]([C@H]([C@H](O1)SC)O)O)O)NC(=O)[C@@H]2[C@H]3[C@@H](C[C@@H](CCO3)CC(C)C)CN2)Cl"
             ],
             "species": [
                 "Escherichia coli", 

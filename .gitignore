@@ -2,3 +2,4 @@
 /cache/duvida/models--*
 /cache/downloads/
 *.log
+/.schemist
