@@ -167,7 +167,7 @@
     "file examples": [
         {
             "label": "E. coli training data from Stokes J. et al., Cell (2020)",
-            "file": "example-data/stokes2020-eco-1000.csv", 
+            "file": "example-data/stokes20-eco-1000.csv", 
             "column": "smiles", 
             "species": "Escherichia coli"
         },
