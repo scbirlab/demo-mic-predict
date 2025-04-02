@@ -233,7 +233,7 @@ def convert_file(
     output_representation: Union[str, Iterable[str]] = 'smiles'
 ):
     output_representation = cast(output_representation, to=list)
-    message = f"Converting from {input_representation} to {"".join(output_representation)}..."
+    message = f"Converting from {input_representation} to {', '.join(output_representation)}..."
     gr.Info(message, duration=5)
     print_err(message)
     print_err(df.head())
