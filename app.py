@@ -677,6 +677,7 @@ if __name__ == "__main__":
                 example_labels=[
                     eg["label"] for eg in EXAMPLES["line input examples"]
                 ],
+                examples_per_page=100,
                 inputs=[
                     line_inputs["strings"], 
                     line_inputs["format"], 

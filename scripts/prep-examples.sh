@@ -5,7 +5,7 @@ OUTPUT="$2"
 FIELDS="$3"
 NLINES="${4:-1000}"
 
-python -m venv .schemist && .schemist/bin/pip install "pandas schemist>=0.0.4" && .schemist/bin/activate
+python -m venv .schemist && .schemist/bin/pip install "pandas" "schemist>=0.0.4" && .schemist/bin/activate
 
 # Some functions for convenience 
 logger () (
@@ -28,6 +28,4 @@ set -x
 
 pandas '[['"$FIELDS"']].sample('"$NLINES"')' \
 < "$INPUT" \
-| schemist convert -c SMILES -2 id smiles inchikey pubchem_id mwt clogp tpsa -f CSV \
-| pandas '.sort_values(["id"])' \
 > "$OUTPUT"
