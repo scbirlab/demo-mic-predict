@@ -170,19 +170,19 @@
         {
             "label": "E. coli training data from Stokes J. et al., Cell (2020)",
             "file": "example-data/stokes20-eco-1000.csv", 
-            "column": "smiles", 
+            "column": "SMILES", 
             "species": "Escherichia coli"
         },
         {
             "label": "A. baumannii training data from Liu G., Nature Chemical Biology (2023)",
             "file": "example-data/liu23-abau-1000.csv", 
-            "column": "smiles", 
+            "column": "SMILES", 
             "species": "Acinetobacter baumannii"
         },
         {
             "label": "S. aureus training data from Wong F., Nature (2024)",
             "file": "example-data/wong24-sau-tox-1000.csv", 
-            "column": "smiles", 
+            "column": "SMILES", 
             "species": "Staphylococcus aureus"
         }
     ]
