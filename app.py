@@ -2,7 +2,6 @@
 
 from typing import Iterable, List, Optional, Union
 import csv
-from functools import partial
 from io import TextIOWrapper
 import itertools
 import json
@@ -234,12 +233,10 @@ def convert_file(
     output_representation: Union[str, Iterable[str]] = 'smiles'
 ):
     output_representation = cast(output_representation, to=list)
-    for rep in output_representation:
-        message = f"Converting from {input_representation} to {rep}..."
-        gr.Info(message, duration=10)
-    print_err(df.head())
+    message = f"Converting from {input_representation} to {"".join(output_representation)}..."
+    gr.Info(message, duration=5)
     print_err(message)
-    gr.Info(message, duration=3)
+    print_err(df.head())
     errors, df = converter(
         df=df,
         column=column,
@@ -247,7 +244,7 @@ def convert_file(
         output_representation=output_representation,
     )
     df = df[
-        cast(output_representation, to=list) +
+        output_representation +
         [col for col in df if col not in output_representation]
     ]
     all_err = sum(err for key, err in errors.items())
@@ -300,15 +297,12 @@ def predict_file(
         + [column] 
         + prediction_cols
     )
-    other_cols = [
-        col for col in prediction_df 
-        if col not in main_cols
-    ]
+    other_cols = list(set(prediction_df) - main_cols)
     prediction_df = prediction_df[
         ['id', 'inchikey'] 
         + [column] 
         + prediction_cols + other_cols 
-        + ['smiles', "mwt", "clogp"]
+        + ["mwt", "clogp"]
     ]
     plot_dropdown = get_dropdown_options(prediction_df, _type="number")
     plot_dropdown = (plot_dropdown,) * 5
