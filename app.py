@@ -292,18 +292,28 @@ def predict_file(
         predict=predict,
         extra_metrics=extra_metrics,
     )
+    left_cols = ['id', 'inchikey']
+    end_cols = ["smiles", "mwt", "clogp"] 
     main_cols = set(
-        ['id', 'inchikey', 'smiles', "mwt", "clogp"] 
+        left_cols 
+        + end_cols
         + [column] 
         + prediction_cols
     )
     other_cols = list(set(prediction_df) - main_cols)
-    prediction_df = prediction_df[
-        ['id', 'inchikey'] 
+    return_cols = (
+        left_cols 
         + [column] 
-        + prediction_cols + other_cols 
-        + ["mwt", "clogp"]
-    ]
+        + prediction_cols 
+        + other_cols 
+        + end_cols
+    )
+    deduplicated_cols = []
+    for col in return_cols:
+        if not col in deduplicated_cols:
+            deduplicated_cols.append(col)
+    prediction_df = prediction_df[deduplicated_cols]
+
     plot_dropdown = get_dropdown_options(prediction_df, _type="number")
     plot_dropdown = (plot_dropdown,) * 5
     gradio_opts = {
