@@ -28,6 +28,6 @@ set -x
 
 pandas '[['"$FIELDS"']].sample('"$NLINES"')' \
 < "$INPUT" \
-| schemist convert -c SMILES -2 id pubchem_id pubchem_name -f CSV \
+| schemist convert -c SMILES -2 id pubchem_id -f CSV \
 | pandas '.sort_values(["id"])' \
 > "$OUTPUT"
