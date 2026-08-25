@@ -1,35 +1,20 @@
 #!/usr/bin/env bash
 
-INPUT="$1"
-OUTPUT="$2"
-FIELDS="$3"
-NLINES="${4:-1000}"
+set -euox pipefail
+
+INPUTS=('hf://datasets/scbirlab/stokes-2020-ai/*-eco0-*.csv.gz' 'hf://datasets/scbirlab/wong-2024-ai/*-*.csv.gz'  'hf://datasets/scbirlab/liu-2023-ai/*-*.csv.gz')
+NAMES=('Escherichia coli K-12' 'Staphylococcus aureus USA300' 'Acinetobacter baumannii ATCC 17978')
+OUTPUTS=('stokes20-eco-1000.csv' 'wong24-sau-tox-1000.csv' 'liu23-abau-1000.csv')
+FIELDS="${1:-'"id", "inchikey", "pubchem_name", "pubchem_id", "smiles", "scaffold", "mwt", "clogp", "tpsa", "normalized_inhibition"'}"
+NLINES="${2:-100}"
 
 python -m venv .schemist \
-&& .schemist/bin/pip install "pandas" "schemist>=0.0.4" \
+&& .schemist/bin/pip install "pandas" "polars" "pyarrow" "schemist>=0.0.4" \
 && source .schemist/bin/activate
 
-# Some functions for convenience 
-logger () (
-    local message="$1"
-    local _date=$(date)
-    local prefix=${2:-"$_date"}
-    >&2 echo "$prefix :: $message"
-)
 
-pandas () (
-    local cmd="$1"
-    local sep1=${2:-,}
-    local idx=${3:-False}
-    local sep2=${4:-"$sep1"}
-    python -c 'import sys; import pandas as pd; df = pd.read_csv(sys.stdin, sep="'"$sep1"'", low_memory=False)'"$cmd"'.to_csv(sys.stdout, index='"$idx"', sep="'"$sep2"'")'
-)
-
-set -e
-set -x
-
-pandas '[['"$FIELDS"']].sample('"$NLINES"')' \
-< "$INPUT" \
-| schemist convert -c SMILES -2 id -f CSV \
-| pandas '.sort_values(["id"])' \
-> "$OUTPUT"
+for i in "${!INPUTS[@]}"
+do 
+    output=data/examples/"${OUTPUTS[$i]}"
+    source scripts/prep-example.sh "${INPUTS[$i]}" "${NAMES[$i]}" "$output" "$FIELDS" $NLINES
+done
