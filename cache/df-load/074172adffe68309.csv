@@ -1,0 +1,12 @@
+id,pubchem_name,pubchem_id,smiles,inchikey,mwt,clogp,full_strain_name,mic_method,pmic
+55907057,doxorubicin,31703,COc1cccc2c1C(=O)c1c(O)c3c(c(O)c1C2=O)C[C@@](O)(C(=O)CO)C[C@@H]3O[C@H]1C[C@H](N)[C@H](O)[C@H](C)O1,AOJJSUZBOXZQNB-TZSSRYMLSA-N,543.1740607479999,0.0012999999999995793,Escherichia coli,Broth microdilution,
+15968459,5-fluorouracil,3385,O=c1[nH]cc(F)c(=O)[nH]1,GHASVSINZRGABV-UHFFFAOYSA-N,130.017855556,-0.7977000000000001,Escherichia coli,Broth microdilution,
+56240604,carmofur,2577,CCCCCCNC(=O)n1cc(F)c(=O)[nH]c1=O,AOCCBINRVIKJHY-UHFFFAOYSA-N,257.117569592,0.8136999999999999,Escherichia coli,Broth microdilution,
+45772418,etoposide,36462,COc1cc([C@@H]2c3cc4c(cc3[C@@H](O[C@@H]3O[C@@H]5CO[C@@H](C)O[C@H]5[C@H](O)[C@H]3O)[C@H]3COC(=O)[C@H]23)OCO4)cc(OC)c1O,VJJPUSNTGOMMGY-MRVIYFEKSA-N,588.1842910839999,1.3385999999999993,Escherichia coli,Broth microdilution,
+37364014,bleomycin,5360373,Cc1c(N)nc([C@H](CC(N)=O)NC[C@H](N)C(N)=O)nc1C(=O)N[C@H](C(=O)N[C@H](C)[C@@H](O)[C@H](C)C(=O)N[C@H](C(=O)NCCc1nc(-c2nc(C(=O)NCCC[S+](C)C)cs2)cs1)[C@@H](C)O)[C@@H](OC1OC(CO)C(O)C(O)C1OC1OC(CO)C(O)C(OC(N)=O)C1O)c1cnc[nH]1,OYVAGSVQBOHSSS-WXFSZRTFSA-O,1414.51843212809,-7.703580000000028,Escherichia coli,Broth microdilution,
+74027950,cyclophosphamide,2907,O=P1(N(CCCl)CCCl)NCCCO1,CMSMOCZEIVJLDB-UHFFFAOYSA-N,260.02481971000003,1.884,Escherichia coli,Broth microdilution,
+11371469,vincristine,5978,CC[C@]1(O)C[C@H]2CN(CCc3c([nH]c4ccccc34)[C@@](C(=O)OC)(c3cc4c(cc3OC)N(C=O)[C@H]3[C@@](O)(C(=O)OC)[C@H](OC(C)=O)[C@]5(CC)C=CCN6CC[C@]43[C@@H]65)C2)C1,OGWKCGZFUXNPDA-XQKSVPLYSA-N,824.3996439920003,3.517500000000003,Escherichia coli,Broth microdilution,
+27859814,procarbazine,4915,CNNCc1ccc(C(=O)NC(C)C)cc1,CPTBDICYNRMXFX-UHFFFAOYSA-N,221.152812228,1.0488,Escherichia coli,Broth microdilution,
+38814951,"cis-oxalato-trans-l-1,2-diaminocyclohexane platinum(ii)",131727701,O=C(O)C(=O)O.[NH-][C@@H]1CCCC[C@H]1[NH-].[Pt+2],DRMCATBEKSVAPL-BNTLRKBRSA-N,397.060148028,1.5551000000000001,Escherichia coli,Broth microdilution,
+74454963,docetaxel,148124,CC(=O)O[C@@]12CO[C@@H]1C[C@H](O)[C@@]1(C)C(=O)[C@H](O)C3=C(C)[C@@H](OC(=O)[C@H](O)[C@@H](NC(=O)OC(C)(C)C)c4ccccc4)C[C@@](O)([C@@H](OC(=O)c4ccccc4)[C@H]21)C3(C)C,ZDZOTLJHXYCWBA-VCVYQWHSSA-N,807.3466053760001,3.259600000000003,Escherichia coli,Broth microdilution,
+71683740,gemcitabine,60750,Nc1ccn([C@@H]2O[C@H](CO)[C@@H](O)C2(F)F)c(=O)n1,SDUQYLNIPVEERB-QPPQHZFASA-N,263.071762272,-1.2886000000000004,Escherichia coli,Broth microdilution,

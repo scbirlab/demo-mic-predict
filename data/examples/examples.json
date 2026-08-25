@@ -12,22 +12,31 @@
             ]
         },
         {
-            "label": "E. coli, K. pneumoniae, & S. aureus vs Ampicillin, Linezolid, Amoxicillin, Meropenem, Avibactam",
+            "label": "E. coli vs Ampicillin, Linezolid, Amoxicillin, Avibactam",
             "strings": [
                 "Ampicillin: CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)[C@@H](C3=CC=CC=C3)N)C(=O)O)C",
                 "Linezolid: CC(=O)NC[C@H]1CN(C(=O)O1)C2=CC(=C(C=C2)N3CCOCC3)F",
                 "Amoxicillin: CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)[C@@H](C3=CC=C(C=C3)O)N)C(=O)O)C", 
-                "Meropenem: C[C@@H]1[C@@H]2[C@H](C(=O)N2C(=C1S[C@H]3C[C@H](NC3)C(=O)N(C)C)C(=O)O)[C@@H](C)O",
                 "Avibactam: C1C[C@H](N2C[C@@H]1N(C2=O)OS(=O)(=O)O)C(=O)N"
             ],
             "species": [
-                "Escherichia coli", 
-                "Klebsiella pneumoniae",
+                "Escherichia coli"
+            ]
+        },
+        {
+            "label": "S. aureus vs Ampicillin, Linezolid, Amoxicillin, Avibactam",
+            "strings": [
+                "Ampicillin: CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)[C@@H](C3=CC=CC=C3)N)C(=O)O)C",
+                "Linezolid: CC(=O)NC[C@H]1CN(C(=O)O1)C2=CC(=C(C=C2)N3CCOCC3)F",
+                "Amoxicillin: CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)[C@@H](C3=CC=C(C=C3)O)N)C(=O)O)C", 
+                "Avibactam: C1C[C@H](N2C[C@@H]1N(C2=O)OS(=O)(=O)O)C(=O)N"
+            ],
+            "species": [
                 "Staphylococcus aureus"
             ]
         },
         {
-            "label": "E. coli, P. aeruginosa, & S. aureus vs Gepotidacin, Murepavadin, Zosurabalpin, Plazomicin, Iboxamycin",
+            "label": "E. coli vs Gepotidacin, Murepavadin, Zosurabalpin, Plazomicin, Iboxamycin",
             "strings": [
                 "Murepavadin: CC[C@H](C)[C@H]1C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N2CCC[C@@H]2C(=O)N3CCC[C@H]3C(=O)N[C@H](C(=O)N[C@H](C(=O)N1)CC4=CNC5=CC=CC=C54)[C@@H](C)O)CO)C)CCN)CCN)CC6=CNC7=CC=CC=C76)CCN)CCN)CCCN)CCN",
                 "Gepotidacin: C1CC2=CC(=NC=C2OC1)CNC3CCN(CC3)C[C@@H]4CN5C(=O)C=CC6=C5N4C(=O)C=N6",
@@ -36,9 +45,7 @@
                 "Iboxamycin: C[C@@H]([C@H]([C@@H]1[C@@H]([C@@H]([C@H]([C@H](O1)SC)O)O)O)NC(=O)[C@@H]2[C@H]3[C@@H](C[C@@H](CCO3)CC(C)C)CN2)Cl"
             ],
             "species": [
-                "Escherichia coli", 
-                "Pseudomonas aeruginosa",
-                "Staphylococcus aureus"
+                "Escherichia coli"
             ]
         },
         {
@@ -52,17 +59,17 @@
             ]
         },
         {
-            "label": "E. coli & A. baumannii vs Trimethoprim, Sulfamethoxazole",
+            "label": "A. baumannii vs Trimethoprim, Sulfamethoxazole",
             "strings": [
                 "Trimethoprim: COC1=CC(=CC(=C1OC)OC)CC2=CN=C(N=C2N)N",
                 "Sulfamethoxazole: C1[C@@H]([C@H]([C@@H]([C@H]([C@@H]1NC(=O)[C@H](CCN)O)O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CO)O)N)O)O)O[C@@H]3[C@@H]([C@H]([C@@H]([C@H](O3)CN)O)O)O)N" 
             ],
             "species": [
-                "Escherichia coli"
+                "Acinetobacter baumannii"
             ]
         },
         {
-            "label": "E. coli, A. baumannii, & S. aureus vs Halicin, Abaucin, Compound 1 (from Wong, 2024)",
+            "label": "E. coli vs Halicin, Abaucin, Compound 1 (from Wong, 2024)",
             "strings": [
                 "Halicin: C1=C(SC(=N1)SC2=NN=C(S2)N)[N+](=O)[O-]",
                 "Abaucin: C1CN(CCC12C3=CC=CC=C3NC(=O)O2)CCC4=CC=C(C=C4)C(F)(F)F",
@@ -76,45 +83,25 @@
             ]
         },
         {
-            "label": "E. coli, P. aeruginosa & S. aureus vs Debio-1452, Debio-1452-NH3, Fabimycin",
+            "label": "A. baumannii vs Halicin, Abaucin, Compound 1 (from Wong, 2024)",
             "strings": [
-                "Debio-1452: CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)CC4)N=C3",
-                "Debio-1452-NH3: CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)[C@@H](C4)N)N=C3",
-                "Fabimycin: CC1=C(OC2=CC=CC=C12)CN(C)C(=O)/C=C/C3=CC4=C(NC(=O)[C@H](CC4)[NH3+])N=C3.[Cl-]"
+                "Halicin: C1=C(SC(=N1)SC2=NN=C(S2)N)[N+](=O)[O-]",
+                "Abaucin: C1CN(CCC12C3=CC=CC=C3NC(=O)O2)CCC4=CC=C(C=C4)C(F)(F)F",
+                "Compound 1: ClC1=CC(Cl)=CC=C1OCC(NC2=C(C(O)=O)C=CC(Cl)=C2)=O"
             ],
             "species": [
-                "Escherichia coli", 
-                "Pseudomonas aeruginosa",
-                "Staphylococcus aureus"
+                "Acinetobacter baumannii"
             ]
         },
         {
-            "label": "E. coli, A. baumannii, K. pneumoniae, P. aeruginosa & S. aureus vs 6NDM, 6NDM-NH3",
-            "strings": [
-                "6NDM: CN1C(C=C(C)C2=CC3=C(N4C(C=C3C)=O)C(OCC4)=C12)=O",
-                "6NDM-NH3: CN1C(C=C(C)C2=CC3=C(N4C(C=C3C)=O)C(OCC4C[NH3+])=C12)=O"
-            ],
-            "species": [
-                "Escherichia coli", 
-                "Acinetobacter baumannii",
-                "Klebsiella pneumoniae",
-                "Pseudomonas aeruginosa",
-                "Staphylococcus aureus"
-            ]
-        },
-        {
-            "label": "E. coli, K. pneumoniae, P. aeruginosa & S. aureus vs Teixobactin, Darobactin, Clovibactin",
+            "label": "E. coli vs Teixobactin, Darobactin, Clovibactin",
             "strings": [
                 "Teixobactin: CC[C@H](C)[C@H]1C(=O)O[C@H]([C@H](C(=O)N[C@H](C(=O)N[C@H](C(=O)N1)C[C@H]2CN=C(N2)N)C)NC(=O)[C@H](CO)NC(=O)[C@H]([C@@H](C)CC)NC(=O)[C@@H]([C@@H](C)CC)NC(=O)[C@@H](CCC(=O)N)NC(=O)[C@H](CO)NC(=O)[C@H]([C@@H](C)CC)NC(=O)[C@@H](CC3=CC=CC=C3)NC)C",
                 "Darobactin: C1[C@@H](C(=O)N[C@H](C(=O)NC2[C@@H](C3=CNC4=C3C=CC(=C4)[C@@H]([C@H](NC(=O)[C@@H](NC2=O)CO)C(=O)N[C@@H](CO)C(=O)N[C@@H](CC5=CC=CC=C5)C(=O)O)CCCN)OC6=CC=CC7=C6NC=C71)CC(=O)N)N",
                 "Clovibactin: C[C@H]1C(=O)N[C@H](C(=O)N[C@H](C(=O)O[C@H]([C@H](C(=O)N1)NC(=O)[C@H](CO)NC(=O)[C@@H](CCCCN)NC(=O)[C@@H](CC(C)C)NC(=O)[C@H](CC2=CC=CC=C2)N)C(=O)N)CC(C)C)CC(C)C"
             ],
             "species": [
-                "Escherichia coli", 
-                "Acinetobacter baumannii",
-                "Klebsiella pneumoniae",
-                "Pseudomonas aeruginosa",
-                "Staphylococcus aureus"
+                "Escherichia coli"
             ]
         },
         {
@@ -151,7 +138,7 @@
             ]
         },
         {
-            "label": "E. coli & K. pneumoniae vs CHIR-090, SCH79797, DBeQ, Tenovin-6, Pyrimethamine, Aminopterin",
+            "label": "E. coli vs CHIR-090, SCH79797, DBeQ, Tenovin-6, Pyrimethamine, Aminopterin",
             "strings": [
                 "CHIR-090: C[C@H]([C@@H](C(=O)NO)NC(=O)C1=CC=C(C=C1)C#CC2=CC=C(C=C2)CN3CCOCC3)O",
                 "SCH79797: CC(C)C1=CC=C(C=C1)CN2C=CC3=C2C=CC4=C3C(=NC(=N4)NC5CC5)N",
@@ -161,27 +148,26 @@
                 "Aminopterin: C1=CC(=CC=C1C(=O)N[C@@H](CCC(=O)O)C(=O)O)NCC2=CN=C3C(=N2)C(=NC(=N3)N)N"
             ],
             "species": [
-                "Escherichia coli", 
-                "Klebsiella pneumoniae"
+                "Escherichia coli"
             ]
         }
     ],
     "file examples": [
         {
             "label": "E. coli training data from Stokes J. et al., Cell (2020)",
-            "file": "example-data/stokes20-eco-1000.csv", 
+            "file": "data/examples/stokes20-eco-1000.csv", 
             "column": "SMILES", 
             "species": "Escherichia coli"
         },
         {
             "label": "A. baumannii training data from Liu G., Nature Chemical Biology (2023)",
-            "file": "example-data/liu23-abau-1000.csv", 
+            "file": "data/examples/liu23-abau-1000.csv", 
             "column": "SMILES", 
             "species": "Acinetobacter baumannii"
         },
         {
             "label": "S. aureus training data from Wong F., Nature (2024)",
-            "file": "example-data/wong24-sau-tox-1000.csv", 
+            "file": "data/examples/wong24-sau-tox-1000.csv", 
             "column": "SMILES", 
             "species": "Staphylococcus aureus"
         }

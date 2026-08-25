@@ -1,5 +1,10 @@
-.gradio/cached_examples/
-/cache/duvida/models--*
+/.gradio/cached_examples/
+/cache/duvidnn/models--*
+/cache/vectome/
 /cache/downloads/
+/cache/csv/
 *.log
-/.schemist
+*.lock
+/venv/
+
+__pycache__/

@@ -1,0 +1,5 @@
+id,pubchem_name,pubchem_id,smiles,inchikey,mwt,clogp,full_strain_name,mic_method,pmic
+39882995,"(2s,5r,6r)-6-[[(2r)-2-azaniumyl-2-phenylacetyl]amino]-3,3-dimethyl-7-oxo-4-thia-1-azabicyclo[3.2.0]heptane-2-carboxylate",7048611,CC1(C)S[C@@H]2[C@H](NC(=O)[C@H](N)c3ccccc3)C(=O)N2[C@H]1C(=O)O,AVKUERGKIZMTKX-NJBDSQKTSA-N,349.109627088,0.3180999999999994,Escherichia coli,Broth microdilution,
+70621966,linezolid,441401,CC(=O)NC[C@H]1CN(c2ccc(N3CCOCC3)c(F)c2)C(=O)O1,TYZROVQLWOKYKF-ZDUSSCGKSA-N,337.14378433999997,1.1235999999999995,Escherichia coli,Broth microdilution,
+32459081,"(2s,5r,6r)-6-[[(2r)-2-azaniumyl-2-(4-hydroxyphenyl)acetyl]amino]-3,3-dimethyl-7-oxo-4-thia-1-azabicyclo[3.2.0]heptane-2-carboxylate",40467057,CC1(C)S[C@@H]2[C@H](NC(=O)[C@H](N)c3ccc(O)cc3)C(=O)N2[C@H]1C(=O)O,LSQZJLSUYDQPKJ-NJBDSQKTSA-N,365.104541708,0.023699999999999555,Escherichia coli,Broth microdilution,
+63603982,"[(2s,5r)-2-carbamoyl-7-oxo-1,6-diazabicyclo[3.2.1]octan-6-yl] sulfate;hydron",90333665,NC(=O)[C@@H]1CC[C@@H]2CN1C(=O)N2OS(=O)(=O)O,NDCUAPJVLWFHHB-UHNVWZDZSA-N,265.03685607200003,-1.5252999999999979,Escherichia coli,Broth microdilution,

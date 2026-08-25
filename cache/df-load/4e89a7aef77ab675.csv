@@ -1,0 +1,7 @@
+id,pubchem_name,pubchem_id,smiles,inchikey,mwt,clogp,full_strain_name,mic_method,pmic
+62395520,chir-090,11546620,C[C@@H](O)[C@H](NC(=O)c1ccc(C#Cc2ccc(CN3CCOCC3)cc2)cc1)C(=O)NO,FQYBTYFKOHPWQT-VGSWGCGISA-N,437.195070964,0.9032000000000002,Escherichia coli,Broth microdilution,
+53665249,sch-79797,4259181,CC(C)c1ccc(Cn2ccc3c4c(N)nc(NC5CC5)nc4ccc32)cc1,AVXQPEKZIGPIJW-UHFFFAOYSA-N,371.2109958000001,4.912700000000004,Escherichia coli,Broth microdilution,
+15733298,"n2,n4-dibenzylquinazoline-2,4-diamine",676352,c1ccc(CNc2nc(NCc3ccccc3)c3ccccc3n2)cc1,QAIMUUJJAJBPCL-UHFFFAOYSA-N,340.16879664,4.854000000000003,Escherichia coli,Broth microdilution,
+10710226,tenovin-6,24772043,CN(C)CCCCC(=O)Nc1ccc(NC(=S)NC(=O)c2ccc(C(C)(C)C)cc2)cc1,BVJSXSQRIUSRCO-UHFFFAOYSA-N,454.240247328,4.781300000000003,Escherichia coli,Broth microdilution,
+28517032,pyrimethamine,4993,CCc1nc(N)nc(N)c1-c1ccc(Cl)cc1,WKSAUQYGYAYLPV-UHFFFAOYSA-N,248.08287409599998,2.5238000000000005,Escherichia coli,Broth microdilution,
+76242396,aminopterin,169371,Nc1nc(N)c2nc(CNc3ccc(C(=O)N[C@@H](CCC(=O)O)C(=O)O)cc3)cnc2n1,TVZGACDUOSZQKY-LBPRGKRZSA-N,440.15566574000013,0.24410000000000132,Escherichia coli,Broth microdilution,

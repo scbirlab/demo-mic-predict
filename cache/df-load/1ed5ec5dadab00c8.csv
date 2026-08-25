@@ -1,0 +1,4 @@
+id,pubchem_name,pubchem_id,smiles,inchikey,mwt,clogp,full_strain_name,mic_method,pmic
+54600065,"5-((5-nitro-1,3-thiazol-2-yl)sulfanyl)-1,3,4-thiadiazol-2-amine",11837140,Nc1nnc(Sc2ncc([N+](=O)[O-])s2)s1,NQQBNZBOOHHVQP-UHFFFAOYSA-N,260.944887336,1.6361999999999999,Escherichia coli,Broth microdilution,
+91102096,rs-102895,10000456,O=C1Nc2ccccc2C2(CCN(CCc3ccc(C(F)(F)F)cc3)CC2)O1,HIDWEYPGMLIQSN-UHFFFAOYSA-N,390.155512572,4.801300000000004,Escherichia coli,Broth microdilution,
+41813270,"4-chloro-2-{[(2,4-dichlorophenoxy)acetyl]amino}benzoic acid",2942818,O=C(COc1ccc(Cl)cc1Cl)Nc1cc(Cl)ccc1C(=O)O,KKKPLTVKYNLFCJ-UHFFFAOYSA-N,372.96754083999997,4.362500000000002,Escherichia coli,Broth microdilution,
