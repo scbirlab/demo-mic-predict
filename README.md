@@ -6,7 +6,7 @@ colorTo: pink
 sdk: gradio
 sdk_version: 6.25.0
 python_version: 3.12.12
-app_file: app.py
+app_file: demo/app.py
 pinned: false
 license: mit
 short_description: Predict MIC (with uncertainty) against bacterial species
