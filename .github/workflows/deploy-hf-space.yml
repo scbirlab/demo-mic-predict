@@ -21,7 +21,6 @@ jobs:
         with:
           github_repo_id: ${{ github.repository }}
           huggingface_repo_id: scbirlab/mic-predict
-          subdirectory: mic-predict
           repo_type: space
           space_sdk: gradio
           hf_token: ${{ secrets.HF_TOKEN }}
