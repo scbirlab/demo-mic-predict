@@ -18,7 +18,7 @@ def plot_x_vs_y(
     df,
     x: str,
     y: str,
-    color: Optional[str] = None,
+    color: Optional[str] = None
 ):  
     message = f"Plotting x={x}, y={y}, color={color}..."
     gr.Info(message, duration=10)
@@ -28,9 +28,9 @@ def plot_x_vs_y(
     if color is not None and color not in cols:
         cols.append(color)
     cols = list(set(cols))
-    x_title, df = log10_if_all_positive(df, x)
-    y_title, df = log10_if_all_positive(df, y)
-    color_title, df = log10_if_all_positive(df, color)
+    # x_title, df = log10_if_all_positive(df, x)
+    # y_title, df = log10_if_all_positive(df, y)
+    # color_title, df = log10_if_all_positive(df, color)
 
     return gr.update(
         value=df[cols],

@@ -1,3 +1,0 @@
-id,pubchem_name,pubchem_id,smiles,inchikey,mwt,clogp,full_strain_name,mic_method,pmic
-88220429,tetracycline,54675776,CN(C)[C@@H]1C(=O)C(C(N)=O)=C(O)[C@@]2(O)C(=O)C3=C(O)c4c(O)cccc4[C@@](C)(O)[C@H]3C[C@@H]12,NWXMGUDVXFXRIG-WESIUVDSSA-N,444.1532657279999,-0.37099999999999905,Escherichia coli,Broth microdilution,
-87836778,anhydrotetracycline,54675758,Cc1c2c(c(O)c3c(O)cccc13)C(=O)[C@]1(O)C(O)=C(C(N)=O)C(=O)[C@@H](N(C)C)[C@@H]1C2,KTTKGQINVKPHLY-DOCRCCHOSA-N,426.1427010439999,0.4558200000000004,Escherichia coli,Broth microdilution,

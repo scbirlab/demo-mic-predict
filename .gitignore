@@ -1,8 +1,10 @@
 /.gradio/cached_examples/
-/cache/duvidnn/models--*
+/cache/models--*/
+/cache/matplotlib/
 /cache/vectome/
 /cache/downloads/
 /cache/csv/
+/cache/df-load/
 *.log
 *.lock
 /venv/

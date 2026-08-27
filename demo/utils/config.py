@@ -4,7 +4,11 @@ CACHE = "./cache"
 import csv
 import json
 import os
+from pathlib import Path
 import sys
+CACHE = str(Path(CACHE).expanduser().resolve())
+print(f">>>>>>> {CACHE=}")
+os.makedirs(CACHE, exist_ok=True)
 os.environ["XDG_CACHE_HOME"] = CACHE
 os.environ["HF_HOME"] = CACHE
 os.environ["DUVIDNN_CACHE"] = CACHE
@@ -24,17 +28,18 @@ HEADER_FILE = os.path.join("sources", "header.md")
 with open(os.path.join("data", "examples", "examples.json"), "r") as f:
     EXAMPLES = json.load(f)
 with open(os.path.join("data", "repos.json"), "r") as f:
-    MODEL_REPOS = json.load(f)
+    REPOS = json.load(f)
+MODEL_REPOS = REPOS["models"]
 
 with open(os.path.join("data", "species-dropdown.json"), "r") as f:
     DROPDOWN = json.load(f)
 
+print(f">>>>>>> {CACHE=}")
 MODELBOXES = {
     key: AutoModelBox.from_pretrained(
         val,
         cache_dir=CACHE,
-    )
-    for key, val in MODEL_REPOS["models"].items()
+    ) for key, val in MODEL_REPOS.items()
 }
 [mb.to(DEVICE) for mb in MODELBOXES.values()]
 

@@ -94,8 +94,8 @@ def _initial_setup(
         ),
         "model": _init_dropdown(
             label="model for prediction",
-            choices=list(repos["models"]),
-            value=list(repos["models"])[0],
+            choices=list(repos),
+            value=list(repos)[0],
         ),
         "species": _init_dropdown(
             label="Species for prediction",

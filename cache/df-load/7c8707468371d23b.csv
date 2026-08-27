@@ -1,3 +1,0 @@
-id,pubchem_name,pubchem_id,smiles,inchikey,mwt,clogp,full_strain_name,mic_method,pmic
-84632098,trimethoprim,5578,COc1cc(Cc2cnc(N)nc2N)cc(OC)c1OC,IEDVJHCEMCRBQM-UHFFFAOYSA-N,290.137890436,1.2575999999999996,Escherichia coli,Broth microdilution,
-27056824,amikacin,37768,NCC[C@H](O)C(=O)N[C@@H]1C[C@H](N)[C@@H](O[C@H]2O[C@H](CN)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@H]1O[C@H]1O[C@H](CO)[C@@H](O)[C@H](N)[C@H]1O,LKCWBDHBTVXHDL-RMDFUYIESA-N,585.2857364359998,-8.424200000000015,Escherichia coli,Broth microdilution,

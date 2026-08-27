@@ -1,4 +1,0 @@
-id,pubchem_name,pubchem_id,smiles,inchikey,mwt,clogp,full_strain_name,mic_method,pmic
-59856225,ciproxan,4011971,O=C(O)c1cn(C2CC2)c2cc(N3CCNCC3)c(F)cc2c1=O,MYSWGUAQZAJSOK-UHFFFAOYSA-N,331.13321965599994,1.5833,Escherichia coli,Broth microdilution,
-37063130,"(6r,7r)-7-[[2-(2-amino-1,3-thiazol-4-yl)-2-methoxyiminoacetyl]amino]-3-[(2-methyl-5,6-dioxo-1h-1,2,4-triazin-3-yl)sulfanylmethyl]-8-oxo-5-thia-1-azabicyclo[4.2.0]oct-2-ene-2-carboxylic acid",51800,CO/N=C(\C(=O)N[C@@H]1C(=O)N2C(C(=O)O)=C(CSc3nc(=O)c(=O)[nH]n3C)CS[C@H]12)c1csc(N)n1,VAAUVRVFOQPIGI-RFAUZJTJSA-N,554.0460579160002,-1.6112999999999957,Escherichia coli,Broth microdilution,
-11207513,c30h34cln7o10s2,175647815,CC(C)(O/N=C(\C(=O)N[C@@H]1C(=O)N2C(C(=O)[O-])=C(C[N+]3(CCNC(=O)c4ccc(O)c(O)c4Cl)CCCC3)CS[C@H]12)c1csc(N)n1)C(=O)O,DBPPRLRVDVJOCL-FQRUVTKNSA-N,751.1497099680003,-0.1816999999999978,Escherichia coli,Broth microdilution,
