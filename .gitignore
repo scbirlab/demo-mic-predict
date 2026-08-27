@@ -3,6 +3,7 @@
 /cache/matplotlib/
 /cache/vectome/
 /cache/downloads/
+/cache/fontconfig/
 /cache/csv/
 /cache/df-load/
 *.log

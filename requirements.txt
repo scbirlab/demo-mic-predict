@@ -1,6 +1,6 @@
 --extra-index-url https://download.pytorch.org/whl/cu113
 carabiner-tools[pd]>=0.0.5.post3
-duvidnn[chem,bio]>=0.0.4
+duvidnn[chem,bio]>=0.0.5
 gradio>=6.25.0
 nemony
 numpy
